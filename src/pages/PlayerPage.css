@@ -1,0 +1,143 @@
+/* PlayerPage Styles */
+
+.player-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #0f1419 0%, #1a1f35 50%, #0f1a2e 100%);
+}
+
+/* Header */
+.player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-4) var(--spacing-page-horizontal);
+  padding-top: var(--spacing-6);
+}
+
+.player-header .back-button {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  transition: all var(--transition-normal);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.player-header .back-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.player-header .back-button:active {
+  transform: scale(0.95);
+}
+
+.player-title {
+  font-size: var(--font-size-title-3);
+  font-weight: var(--font-weight-semibold);
+  color: white;
+}
+
+.header-spacer {
+  width: 44px;
+}
+
+/* Content */
+.player-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--spacing-8);
+}
+
+/* Override MusicPlayer colors for dark theme */
+.player-page .music-player {
+  color: white;
+}
+
+.player-page .track-title {
+  color: white;
+}
+
+.player-page .track-description {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.player-page .progress-bar {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.player-page .time-display {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.player-page .restart-button {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.player-page .restart-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.player-page .warning-banner {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.player-page .warning-text {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.player-page .warning-text small {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.player-page .regenerate-button {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.player-page .regenerate-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.player-page .regenerate-button:active {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(0.98) translateY(0);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

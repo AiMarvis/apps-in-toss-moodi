@@ -1,0 +1,149 @@
+.calendar-container {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-card-padding);
+  box-shadow: var(--shadow-card);
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  user-select: none;
+  transition: transform var(--transition-normal);
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-5);
+  padding: 0 var(--spacing-2);
+}
+
+.month-title {
+  font-family: var(--font-family);
+  font-size: var(--font-size-title-3);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-main);
+}
+
+.nav-button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-2);
+  border-radius: var(--radius-button-sm);
+  color: var(--color-text-sub);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.nav-button:hover {
+  background-color: var(--color-background);
+  color: var(--color-text-main);
+}
+
+.weekdays-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: var(--spacing-2);
+  text-align: center;
+}
+
+.weekday-label {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-sub);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-2) 0;
+}
+
+.days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: var(--spacing-2);
+}
+
+.day-cell {
+  position: relative;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+  margin: 0 auto;
+  width: 36px;
+  height: 36px;
+}
+
+.day-cell:hover {
+  background-color: var(--color-background);
+}
+
+.day-cell:active {
+  transform: scale(0.95);
+}
+
+.day-number {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  color: var(--color-text-main);
+  z-index: 1;
+}
+
+/* States */
+.day-outside {
+  color: var(--color-text-hint);
+}
+
+.day-today {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-bold);
+}
+
+.day-today::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1.5px solid var(--color-primary);
+  border-radius: 50%;
+}
+
+.day-selected {
+  background-color: var(--color-text-main) !important;
+  color: var(--color-surface) !important;
+}
+
+.day-selected .day-today {
+  color: var(--color-surface);
+}
+
+.day-selected.day-today::after {
+  border-color: var(--color-surface);
+  opacity: 0.5;
+}
+
+/* Emotion Indicators */
+.emotion-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  position: absolute;
+  bottom: 4px;
+  /* Default color if not set */
+  background-color: var(--color-text-hint);
+}
+
+.day-selected .emotion-dot {
+  background-color: var(--color-surface);
+}
+
+/* Specific Emotion Colors - applied via inline style or classes */
+/* But strictly we should use the variables.
+   React will inject these as style={{ backgroundColor: 'var(--color-emotion-sad)' }}
+*/

@@ -1,0 +1,120 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { EmotionChip } from '../components/common/EmotionChip';
+import { CreditIndicator } from '../components/credit/CreditIndicator';
+import { EMOTIONS } from '../constants/emotions';
+import type { EmotionKeyword } from '../types/emotion';
+import { useCredits } from '../hooks/useCredits';
+import './HomePage.css';
+
+const MAX_TEXT_LENGTH = 100;
+
+/**
+ * 홈 페이지 - 감정 입력 UI (PRD 5.1)
+ * - 감정 키워드 칩 선택
+ * - 추가 텍스트 입력 (선택)
+ * - 음악 생성 시작 버튼
+ */
+export const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+  const { credits } = useCredits();
+  
+  const [selectedEmotion, setSelectedEmotion] = useState<EmotionKeyword | null>(null);
+  const [emotionText, setEmotionText] = useState('');
+
+  const canGenerate = selectedEmotion !== null && credits > 0;
+
+  const handleGenerate = () => {
+    if (!canGenerate) return;
+    
+    // 로딩 페이지로 이동하며 감정 정보 전달
+    navigate('/loading', {
+      state: {
+        emotion: selectedEmotion,
+        emotionText: emotionText.trim() || undefined,
+      },
+    });
+  };
+
+  return (
+    <div className="home-page">
+      {/* Header */}
+      <header className="home-header">
+        <h1 className="home-title">무디</h1>
+        <CreditIndicator />
+      </header>
+
+      {/* Main Content */}
+      <main className="home-content">
+        {/* Greeting */}
+        <section className="greeting-section">
+          <h2 className="greeting-title">오늘 기분이 어때요?</h2>
+          <p className="greeting-subtitle">
+            감정을 선택하면 당신만을 위한<br />
+            음악을 만들어 드릴게요
+          </p>
+        </section>
+
+        {/* Emotion Selection */}
+        <section className="emotion-section home-card">
+          <h3 className="section-label">지금 느끼는 감정을 선택해주세요</h3>
+          <div className="emotion-grid">
+            {EMOTIONS.map((emotion) => (
+              <div className="emotion-chip-wrapper" key={emotion.id}>
+                <EmotionChip
+                  emotion={emotion}
+                  selected={selectedEmotion === emotion.id}
+                  onClick={() => setSelectedEmotion(emotion.id)}
+                  disabled={credits <= 0}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Text Input (Optional) */}
+        <section className="text-section home-card">
+          <label className="section-label" htmlFor="emotion-text">
+            더 이야기하고 싶은 게 있다면 <span className="optional">(선택)</span>
+          </label>
+          <div className="text-input-container">
+            <textarea
+              id="emotion-text"
+              className="emotion-textarea"
+              value={emotionText}
+              onChange={(e) => setEmotionText(e.target.value.slice(0, MAX_TEXT_LENGTH))}
+              placeholder="예: 비 오는 날 창 밖을 보며 생각이 많아졌어요"
+              rows={3}
+              disabled={credits <= 0}
+            />
+            <span className="char-count">
+              {emotionText.length} / {MAX_TEXT_LENGTH}
+            </span>
+          </div>
+        </section>
+
+        {/* Credit Warning */}
+        {credits <= 0 && (
+          <div className="credit-warning-container">
+            <div className="credit-warning">
+              <span className="warning-icon">⚠️</span>
+              <span>오늘의 크레딧을 모두 사용했어요.<br/>내일 다시 만나요!</span>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Generate Button */}
+      <footer className="home-footer">
+        <button
+          className={`generate-button ${canGenerate ? '' : 'disabled'}`}
+          onClick={handleGenerate}
+          disabled={!canGenerate}
+        >
+          🎵 나만의 음악 만들기
+        </button>
+      </footer>
+    </div>
+  );
+};
+

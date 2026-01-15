@@ -1,0 +1,100 @@
+.tab-bar {
+  position: fixed;
+  bottom: calc(var(--spacing-5) + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: calc(100% - (var(--spacing-5) * 2));
+  max-width: 480px;
+  height: 72px;
+  padding: 0 var(--spacing-3);
+  background: var(--color-surface-glass);
+  backdrop-filter: var(--glass-blur-strong);
+  -webkit-backdrop-filter: var(--glass-blur-strong);
+  border: 1px solid var(--color-surface-glass-border);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-float), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+  z-index: 100;
+  box-sizing: border-box;
+  transition: all var(--transition-normal);
+}
+
+.tab-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+  padding: 4px 0;
+  background: none;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+  color: var(--color-text-sub);
+}
+
+.tab-item:active {
+  transform: scale(0.95);
+}
+
+.tab-icon {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 2px;
+  transition: all var(--transition-fast);
+  opacity: 0.6;
+  filter: saturate(0.7);
+}
+
+.tab-label {
+  font-size: 10px;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-sub);
+  opacity: 0.8;
+  transition: color var(--transition-fast);
+}
+
+.tab-item.active .tab-icon {
+  transform: scale(1.15);
+  opacity: 1;
+  filter: saturate(1) drop-shadow(0 2px 8px rgba(66, 126, 255, 0.3));
+}
+
+.tab-item.active .tab-label {
+  color: var(--color-text-main);
+  font-weight: var(--font-weight-bold);
+  opacity: 1;
+}
+
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, rgba(66, 126, 255, 0.15) 0%, rgba(66, 126, 255, 0.05) 100%);
+  border-radius: 50%;
+  z-index: -1;
+  animation: fadeIn 0.3s ease forwards;
+  box-shadow: 0 0 16px rgba(66, 126, 255, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  .tab-bar {
+    background-color: rgba(30, 30, 30, 0.85);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  .tab-item.active::after {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+

@@ -1,0 +1,228 @@
+/* Global Styles for Moodi */
+@import './tokens.css';
+
+/* Reset & Base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--color-background-gradient);
+  color: var(--color-text-main);
+  line-height: var(--line-height-normal);
+  min-height: 100vh;
+  overscroll-behavior-y: none;
+}
+
+/* App Container */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Typography */
+h1 {
+  font-size: var(--font-size-title-1);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
+}
+
+h2 {
+  font-size: var(--font-size-title-2);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.3;
+}
+
+h3 {
+  font-size: var(--font-size-title-3);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-normal);
+}
+
+p {
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Links */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+/* Buttons */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* Inputs */
+input,
+textarea {
+  font-family: inherit;
+  font-size: var(--font-size-body);
+}
+
+/* Images */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Page Layout */
+.page {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-page-vertical) var(--spacing-page-horizontal);
+  padding-bottom: calc(var(--spacing-page-vertical) + 80px); /* Tabbar 공간 */
+}
+
+.page-content {
+  flex: 1;
+}
+
+/* Card */
+.card {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--spacing-card-padding);
+}
+
+/* Section */
+.section {
+  margin-bottom: var(--spacing-section-gap);
+}
+
+.section-title {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-sub);
+  margin-bottom: var(--spacing-3);
+}
+
+/* Focus States */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+}
+
+/* Touch Target */
+.touchable {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Splash Screen - 앱 시작 시 로그인 진행 중 표시 */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    var(--color-background) 0%,
+    #1a1a2e 50%,
+    #16213e 100%
+  );
+  z-index: 9999;
+}
+
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-4);
+}
+
+.splash-title {
+  font-size: 48px;
+  font-weight: var(--font-weight-bold);
+  background: linear-gradient(135deg, var(--color-primary) 0%, #a78bfa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+}
+
+.splash-subtitle {
+  font-size: var(--font-size-body);
+  color: var(--color-text-sub);
+}
+
+.splash-loader {
+  margin-top: var(--spacing-6);
+}
+
+.splash-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(139, 92, 246, 0.2);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+

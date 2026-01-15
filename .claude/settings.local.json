@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(knowlege-skills:docs-search)",
+      "Bash(cat:*)",
+      "Bash(python:*)",
+      "Bash(unzip:*)"
+    ]
+  }
+}

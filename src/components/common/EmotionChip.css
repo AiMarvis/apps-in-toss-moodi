@@ -1,0 +1,123 @@
+/* EmotionChip Styles */
+
+.emotion-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 100px;
+  padding: 16px;
+  border-radius: var(--radius-xl);
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  background: var(--color-surface-glass);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--color-surface-glass-border);
+  box-shadow: var(--shadow-card);
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.emotion-chip::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--emotion-color, var(--color-primary)), transparent);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+}
+
+.emotion-chip .emoji {
+  font-size: 36px;
+  width: 48px;
+  height: 48px;
+  line-height: 1;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.1));
+  transition: transform var(--transition-normal);
+  object-fit: contain;
+}
+
+.emotion-chip .label {
+  font-size: 14px;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-sub);
+  transition: all var(--transition-normal);
+}
+
+/* Selected State */
+.emotion-chip.selected {
+  background: linear-gradient(135deg, var(--emotion-color, var(--color-primary)) 0%, rgba(255, 255, 255, 0.9) 100%);
+  border-color: var(--emotion-color, var(--color-primary));
+  box-shadow: var(--shadow-button), 0 0 20px rgba(66, 126, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.emotion-chip.selected::before {
+  opacity: 1;
+}
+
+.emotion-chip.selected .emoji {
+  transform: scale(1.1);
+}
+
+.emotion-chip.selected .label {
+  color: #ffffff;
+  font-weight: var(--font-weight-bold);
+}
+
+/* Hover State */
+.emotion-chip:not(.selected):not(.disabled):hover {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: rgba(66, 126, 255, 0.3);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-float);
+}
+
+.emotion-chip:not(.selected):not(.disabled):hover .emoji {
+  transform: scale(1.05);
+}
+
+/* Active/Pressed State */
+.emotion-chip:not(.disabled):active {
+  transform: scale(0.97) translateY(0);
+}
+
+/* Focus State */
+.emotion-chip:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Disabled State */
+.emotion-chip.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

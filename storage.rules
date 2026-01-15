@@ -1,0 +1,36 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // 트랙 음악 파일: 본인만 읽기, 쓰기는 Functions에서만
+    match /tracks/{userId}/{trackId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false;  // Functions에서만 업로드
+    }
+    
+    // 앨범 아트: 공개 읽기
+    match /album-art/{filename} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

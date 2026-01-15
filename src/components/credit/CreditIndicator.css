@@ -1,0 +1,78 @@
+/* CreditIndicator Styles */
+
+.credit-indicator {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-soft);
+}
+
+.credit-indicator.small {
+  padding: 4px 8px;
+}
+
+.credit-icon {
+  font-size: 14px;
+}
+
+.credit-indicator.small .credit-icon {
+  font-size: 12px;
+}
+
+.credit-count {
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.credit-indicator.small .credit-count {
+  font-size: var(--font-size-caption);
+}
+
+.credit-label {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-hint);
+}
+
+.credit-indicator.small .credit-label {
+  font-size: var(--font-size-small);
+}
+
+/* Low State */
+.credit-indicator.low .credit-count {
+  color: var(--color-warning);
+}
+
+/* Empty State */
+.credit-indicator.empty {
+  background-color: var(--color-error);
+}
+
+.credit-indicator.empty .credit-icon,
+.credit-indicator.empty .credit-count,
+.credit-indicator.empty .credit-label {
+  color: white;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
