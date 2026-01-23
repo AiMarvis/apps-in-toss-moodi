@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { 
   collection, 
   query, 
@@ -130,7 +130,7 @@ export function useDiary(): UseDiaryReturn {
         date: request.date,
         emotion: request.emotion,
         content: request.content,
-        trackId: request.trackId || null,
+        trackId: request.trackId || undefined,
         createdAt: now,
         updatedAt: now,
       };

@@ -18,7 +18,7 @@ html {
 
 body {
   font-family: var(--font-family);
-  background: var(--color-background-gradient);
+  background-color: var(--color-background);
   color: var(--color-text-main);
   line-height: var(--line-height-normal);
   min-height: 100vh;

@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+node_modules.nosync
 dist
 dist-ssr
 *.local
@@ -24,3 +25,21 @@ dist-ssr
 *.sw?
 
 .granite
+
+# Environment files (민감한 정보)
+.env
+.env.*
+!.env.example
+functions/.env
+
+# 인증서 및 보안 관련
+mTLS_*/
+
+# 백업 파일
+*.bak
+
+# 로컬 개발용 설정 (marvis 개인 설정)
+granite.config-marvis.ts
+moodi-marvis.ait
+package-marvis.json
+package-lock-marvis.json

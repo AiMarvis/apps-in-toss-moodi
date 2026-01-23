@@ -8,7 +8,7 @@ export default defineConfig({
     icon: '/moodi-icon.svg',
   },
   web: {
-    host: '0.0.0.0',  // 모든 네트워크 인터페이스에서 접근 가능
+    host: 'localhost',  // 에뮬레이터에서는 localhost 사용 (adb reverse로 연결)
     port: 5173,
     commands: {
       dev: 'vite --host --port 5173 --strictPort',

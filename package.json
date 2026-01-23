@@ -7,6 +7,7 @@
     "dev": "node scripts/granite-dev.mjs",
     "dev:granite": "node scripts/granite-dev.mjs",
     "dev:vite": "node scripts/dev.mjs",
+    "dev:simple": "vite --host --port 5173",
     "build": "granite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -14,11 +15,11 @@
   },
   "dependencies": {
     "@apps-in-toss/web-framework": "^1.5.3",
+    "date-fns": "^4.1.0",
     "firebase": "^12.7.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.11.0",
-    "vite-plugin-svgr": "^4.5.0"
+    "react-router-dom": "^7.11.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

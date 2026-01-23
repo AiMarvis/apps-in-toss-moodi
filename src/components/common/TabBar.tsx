@@ -7,14 +7,13 @@ interface TabItem {
   label: string;
   icon: string;
   iconActive: string;
-  icon3D: string;
 }
 
 const TABS: TabItem[] = [
-  { path: '/', label: '홈', icon: '🏠', iconActive: '🏠', icon3D: '/assets/icons/home-3d.svg' },
-  { path: '/calendar', label: '캘린더', icon: '📅', iconActive: '📅', icon3D: '/assets/icons/calendar-3d.svg' },
-  { path: '/library', label: '내 음악', icon: '🎵', iconActive: '🎵', icon3D: '/assets/icons/music-3d.svg' },
-  { path: '/settings', label: '설정', icon: '⚙️', iconActive: '⚙️', icon3D: '/assets/icons/settings-3d.svg' },
+  { path: '/', label: '홈', icon: '🏠', iconActive: '🏠' },
+  { path: '/calendar', label: '캘린더', icon: '📅', iconActive: '📅' },
+  { path: '/library', label: '내 음악', icon: '🎵', iconActive: '🎵' },
+  { path: '/settings', label: '설정', icon: '⚙️', iconActive: '⚙️' },
 ];
 
 /**
@@ -43,7 +42,7 @@ export const TabBar: React.FC = () => {
             aria-label={tab.label}
             aria-current={isActive ? 'page' : undefined}
           >
-            <img src={tab.icon3D} alt="" className="tab-icon" />
+            <span className="tab-icon">{isActive ? tab.iconActive : tab.icon}</span>
             <span className="tab-label">{tab.label}</span>
           </button>
         );

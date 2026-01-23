@@ -8,14 +8,14 @@
   align-items: center;
   width: calc(100% - (var(--spacing-5) * 2));
   max-width: 480px;
-  height: 72px;
-  padding: 0 var(--spacing-3);
-  background: var(--color-surface-glass);
-  backdrop-filter: var(--glass-blur-strong);
-  -webkit-backdrop-filter: var(--glass-blur-strong);
-  border: 1px solid var(--color-surface-glass-border);
+  height: 64px;
+  padding: 0 var(--spacing-2);
+  background-color: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
   border-radius: var(--radius-full);
-  box-shadow: var(--shadow-float), 0 0 0 1px rgba(255, 255, 255, 0.6) inset;
+  box-shadow: var(--shadow-float);
   z-index: 100;
   box-sizing: border-box;
   transition: all var(--transition-normal);
@@ -44,12 +44,10 @@
 }
 
 .tab-icon {
-  width: 28px;
-  height: 28px;
+  font-size: 24px;
   margin-bottom: 2px;
-  transition: all var(--transition-fast);
-  opacity: 0.6;
-  filter: saturate(0.7);
+  transition: transform var(--transition-fast);
+  filter: grayscale(100%) opacity(0.7);
 }
 
 .tab-label {
@@ -61,9 +59,8 @@
 }
 
 .tab-item.active .tab-icon {
-  transform: scale(1.15);
-  opacity: 1;
-  filter: saturate(1) drop-shadow(0 2px 8px rgba(66, 126, 255, 0.3));
+  transform: scale(1.1);
+  filter: none;
 }
 
 .tab-item.active .tab-label {
@@ -78,13 +75,12 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 56px;
-  height: 56px;
-  background: linear-gradient(135deg, rgba(66, 126, 255, 0.15) 0%, rgba(66, 126, 255, 0.05) 100%);
+  width: 48px;
+  height: 48px;
+  background-color: rgba(0, 0, 0, 0.04);
   border-radius: 50%;
   z-index: -1;
   animation: fadeIn 0.3s ease forwards;
-  box-shadow: 0 0 16px rgba(66, 126, 255, 0.2);
 }
 
 @media (prefers-color-scheme: dark) {

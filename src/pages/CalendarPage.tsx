@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { format, startOfMonth, addMonths, subMonths } from 'date-fns';
+import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { CalendarView } from '../components/calendar/CalendarView';
 import { useDiary } from '../hooks/useDiary';
@@ -10,7 +10,7 @@ import './CalendarPage.css';
 
 export const CalendarPage: React.FC = () => {
   const navigate = useNavigate();
-  const { diaries, loading, fetchDiariesByMonth } = useDiary();
+  const { diaries, fetchDiariesByMonth } = useDiary();
   
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
