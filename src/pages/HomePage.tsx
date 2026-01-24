@@ -9,6 +9,15 @@ import './HomePage.css';
 
 const MAX_TEXT_LENGTH = 100;
 
+const MUSIC_TYPES = [
+  { id: 'calm', label: '잔잔한', emoji: '🌊' },
+  { id: 'upbeat', label: '신나는', emoji: '🎉' },
+  { id: 'dramatic', label: '드라마틱', emoji: '🎭' },
+  { id: 'jazz', label: '재즈', emoji: '🎷' },
+  { id: 'classical', label: '클래식', emoji: '🎻' },
+  { id: 'lofi', label: 'Lo-fi', emoji: '🎧' },
+];
+
 /**
  * 홈 페이지 - 감정 입력 UI (PRD 5.1)
  * - 감정 키워드 칩 선택
@@ -20,6 +29,7 @@ export const HomePage: React.FC = () => {
   const { credits } = useCredits();
   
   const [selectedEmotion, setSelectedEmotion] = useState<EmotionKeyword | null>(null);
+  const [selectedMusicType, setSelectedMusicType] = useState<string | null>(null);
   const [emotionText, setEmotionText] = useState('');
 
   const canGenerate = selectedEmotion !== null && credits > 0;
@@ -31,6 +41,7 @@ export const HomePage: React.FC = () => {
     navigate('/loading', {
       state: {
         emotion: selectedEmotion,
+        musicType: selectedMusicType,
         emotionText: emotionText.trim() || undefined,
       },
     });
@@ -68,6 +79,26 @@ export const HomePage: React.FC = () => {
                   disabled={credits <= 0}
                 />
               </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Music Type Selection (Optional) */}
+        <section className="music-type-section home-card">
+          <h3 className="section-label">
+            어떤 스타일의 음악을 원하시나요? <span className="optional">(선택)</span>
+          </h3>
+          <div className="music-type-scroll">
+            {MUSIC_TYPES.map((type) => (
+              <button
+                key={type.id}
+                className={`music-type-chip ${selectedMusicType === type.id ? 'selected' : ''} ${credits <= 0 ? 'disabled' : ''}`}
+                onClick={() => setSelectedMusicType(selectedMusicType === type.id ? null : type.id)}
+                disabled={credits <= 0}
+              >
+                <span>{type.emoji}</span>
+                <span>{type.label}</span>
+              </button>
             ))}
           </div>
         </section>
