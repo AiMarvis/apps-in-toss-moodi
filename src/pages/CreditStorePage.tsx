@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CreditIndicator } from '../components/credit/CreditIndicator';
 import { useCredits } from '../hooks/useCredits';
-import { DAILY_CREDITS } from '../constants/emotions';
+import { INITIAL_CREDITS } from '../constants/emotions';
 import './CreditStorePage.css';
 
-// 크레딧 패키지 (MVP: Mock 구현)
+// 크레딧 패키지
 const CREDIT_PACKAGES = [
-  { id: 'small', amount: 10, price: '₩1,000', popular: false },
-  { id: 'medium', amount: 30, price: '₩2,500', popular: true },
-  { id: 'large', amount: 100, price: '₩7,000', popular: false },
+  { id: 'basic', amount: 10, price: '₩3,300', popular: false },
+  { id: 'value', amount: 33, price: '₩9,900', popular: true },
 ];
 
 /**
@@ -58,7 +57,7 @@ export const CreditStorePage: React.FC = () => {
           <p className="credits-label">현재 보유 크레딧</p>
           <CreditIndicator showLabel={false} size="medium" />
           <p className="credits-info">
-            매일 {DAILY_CREDITS}개의 무료 크레딧이 충전돼요
+            첫 가입 시 {INITIAL_CREDITS}크레딧이 무료로 증정돼요
           </p>
         </section>
 

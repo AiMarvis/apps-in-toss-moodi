@@ -40,7 +40,7 @@ export function useIap(): UseIapReturn {
                 const result = await grantCreditsFn({
                   orderId,
                   sku: product.sku,
-                  credits: product.credits,
+                  credits: product.amount,
                 });
                 return result.data.success;
               } catch (err) {

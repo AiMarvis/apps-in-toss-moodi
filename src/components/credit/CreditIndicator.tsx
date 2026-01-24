@@ -1,6 +1,5 @@
 import React from 'react';
 import { useCredits } from '../../hooks/useCredits';
-import { DAILY_CREDITS } from '../../constants/emotions';
 import './CreditIndicator.css';
 
 interface CreditIndicatorProps {
@@ -31,7 +30,7 @@ export const CreditIndicator: React.FC<CreditIndicatorProps> = ({
         <>
           <span className="credit-count">{credits}</span>
           {showLabel && (
-            <span className="credit-label">/ {DAILY_CREDITS}</span>
+            <span className="credit-label">크레딧</span>
           )}
         </>
       )}

@@ -35,13 +35,15 @@ export function useMyTracks(): MyTracksState {
 
     try {
       // Lazy Auth: Firebase 기능 사용 전 인증 보장
-      await ensureAuth();
+      const user = await ensureAuth();
+      console.log('[useMyTracks] 인증된 사용자:', user.uid);
 
       const result = await getMyTracks({
         limit: PAGE_SIZE,
         startAfter: reset ? undefined : lastTrackId,
       });
 
+      console.log('[useMyTracks] 조회된 트랙 수:', result.tracks.length, result.tracks);
       const newTracks = result.tracks;
 
       if (reset) {

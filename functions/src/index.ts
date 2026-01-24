@@ -34,8 +34,8 @@ const SUNO_API_BASE = 'https://api.sunoapi.org';
 const TOSS_MTLS_CERT = defineSecret('TOSS_MTLS_CERT');
 const TOSS_MTLS_KEY = defineSecret('TOSS_MTLS_KEY');
 
-// 일일 무료 크레딧
-const DAILY_CREDITS = 5;
+// 첫 가입 시 증정 크레딧
+const INITIAL_CREDITS = 5;
 
 /**
  * 1. 음악 생성 요청
@@ -79,24 +79,37 @@ export const generateMusic = functions
       // 음악 프롬프트 생성
       const prompt = buildMusicPrompt(emotion, text);
 
-      // Suno API 호출
+      // Suno API 호출 (콜백 URL 포함)
+      const callBackUrl = 'https://us-central1-moodi-b8811.cloudfunctions.net/sunoCallback';
       const sunoResponse = await axios.post(
         `${SUNO_API_BASE}/api/v1/generate`,
         {
           prompt,
-          model: 'V4_5',
-          make_instrumental: false,
+          model: 'V4_5ALL',
+          instrumental: false,
+          customMode: false,
+          callBackUrl,
         },
         {
           headers: {
-            'Authorization': `Bearer ${SUNO_API_KEY.value()}`,
+            'Authorization': `Bearer ${SUNO_API_KEY.value().trim()}`,
             'Content-Type': 'application/json',
           },
           timeout: 30000,
         }
       );
 
-      const taskId = sunoResponse.data.task_id;
+      const taskId = sunoResponse.data.data.taskId;
+
+      // Firestore에 pending 상태로 작업 저장
+      await db.collection('pendingTasks').doc(taskId).set({
+        taskId,
+        userId,
+        emotion,
+        emotionText: text,
+        status: 'pending',
+        createdAt: admin.firestore.Timestamp.now(),
+      });
 
       // 크레딧 차감
       await userRef.update({
@@ -112,7 +125,8 @@ export const generateMusic = functions
 
 /**
  * 2. 생성 상태 확인 + 완료 시 저장
- * - Suno API 상태 조회
+ * - 먼저 pendingTasks에서 콜백 처리 완료 여부 확인
+ * - 미완료 시 Suno API 상태 조회 (폴링 방식 fallback)
  * - 완료 시 Firebase Storage에 업로드
  * - Firestore에 메타데이터 저장
  */
@@ -127,22 +141,47 @@ export const checkAndSaveMusic = functions
     const userId = context.auth.uid;
 
     try {
-      // Suno API 상태 확인
+      // 1. pendingTasks에서 콜백 처리 완료 여부 확인
+      const pendingTaskDoc = await db.collection('pendingTasks').doc(taskId).get();
+
+      if (pendingTaskDoc.exists) {
+        const pendingTask = pendingTaskDoc.data()!;
+
+        // 콜백으로 이미 완료된 경우 - tracks에서 조회하여 반환
+        if (pendingTask.status === 'completed' && pendingTask.trackId) {
+          const trackDoc = await db.collection('tracks').doc(pendingTask.trackId).get();
+          if (trackDoc.exists) {
+            return { status: 'complete', track: trackDoc.data() as Track };
+          }
+        }
+
+        // 콜백에서 실패 처리된 경우
+        if (pendingTask.status === 'failed') {
+          throw new functions.https.HttpsError('internal', pendingTask.errorMessage || '음악 생성에 실패했어요.');
+        }
+      }
+
+      // 2. 아직 콜백이 처리되지 않은 경우 - Suno API 직접 조회 (fallback)
       const statusResponse = await axios.get(
-        `${SUNO_API_BASE}/api/v1/music/${taskId}`,
+        `${SUNO_API_BASE}/api/v1/generate/record-info?taskId=${taskId}`,
         {
           headers: {
-            'Authorization': `Bearer ${SUNO_API_KEY.value()}`,
+            'Authorization': `Bearer ${SUNO_API_KEY.value().trim()}`,
           },
           timeout: 30000,
         }
       );
 
-      const result = statusResponse.data;
+      const apiResponse = statusResponse.data;
+      const taskData = apiResponse.data;
+      const taskStatus = taskData?.status;
 
-      if (result.status === 'complete' && result.audio_url) {
+      // 성공: status가 'SUCCESS'이고 response.data에 오디오 정보가 있을 때
+      if (taskStatus === 'SUCCESS' && taskData?.response?.data?.[0]?.audio_url) {
+        const audioInfo = taskData.response.data[0];
+
         // 음악 파일 다운로드
-        const audioResponse = await axios.get(result.audio_url, {
+        const audioResponse = await axios.get(audioInfo.audio_url, {
           responseType: 'arraybuffer',
           timeout: 60000,
         });
@@ -178,7 +217,7 @@ export const checkAndSaveMusic = functions
           description: generateDescription(emotion as EmotionKeyword),
           audioUrl,
           albumArt: getAlbumArt(emotion as EmotionKeyword),
-          duration: result.duration || 60,
+          duration: audioInfo.duration || 60,
           createdAt: admin.firestore.Timestamp.now(),
           sunoTaskId: taskId,
         };
@@ -193,10 +232,16 @@ export const checkAndSaveMusic = functions
         return { status: 'complete', track: trackData };
       }
 
-      // 아직 처리 중
+      // 실패 상태 처리
+      if (taskStatus === 'FAILED') {
+        const errorMessage = taskData?.errorMessage || '음악 생성에 실패했어요.';
+        throw new functions.https.HttpsError('internal', errorMessage);
+      }
+
+      // 아직 처리 중 (GENERATING, PENDING)
       return {
-        status: result.status || 'processing',
-        progress: result.progress || 50,
+        status: taskStatus === 'GENERATING' ? 'processing' : (taskStatus || 'processing'),
+        progress: taskStatus === 'GENERATING' ? 50 : 30,
       };
     } catch (error) {
       console.error('상태 확인 실패:', error);
@@ -287,39 +332,13 @@ export const deleteTrack = functions.https.onCall(async (data: DeleteTrackReques
 });
 
 /**
- * 5. 크레딧 일일 리셋 (Scheduled Function)
- * 매일 자정(KST)에 실행
- */
-export const resetDailyCredits = functions.pubsub
-  .schedule('0 0 * * *')
-  .timeZone('Asia/Seoul')
-  .onRun(async () => {
-    try {
-      const usersSnapshot = await db.collection('users').get();
-      const batch = db.batch();
-
-      usersSnapshot.docs.forEach((doc) => {
-        batch.update(doc.ref, {
-          credits: DAILY_CREDITS,
-          lastCreditReset: admin.firestore.Timestamp.now(),
-        });
-      });
-
-      await batch.commit();
-      console.log(`${usersSnapshot.size}명의 크레딧이 리셋되었습니다.`);
-    } catch (error) {
-      console.error('크레딧 리셋 실패:', error);
-    }
-  });
-
-/**
  * 6. 사용자 생성 (첫 로그인 시 자동 실행)
  */
 export const createUser = functions.auth.user().onCreate(async (user) => {
   try {
     await db.collection('users').doc(user.uid).set({
       id: user.uid,
-      credits: DAILY_CREDITS,
+      credits: INITIAL_CREDITS,
       lastCreditReset: admin.firestore.Timestamp.now(),
       createdAt: admin.firestore.Timestamp.now(),
       trackCount: 0,
@@ -429,7 +448,7 @@ export const loginWithToss = functions
         await userRef.set({
           id: firebaseUid,
           tossUserKey: tossUserKey,
-          credits: DAILY_CREDITS,
+          credits: INITIAL_CREDITS,
           lastCreditReset: admin.firestore.Timestamp.now(),
           createdAt: admin.firestore.Timestamp.now(),
           trackCount: 0,
@@ -570,6 +589,135 @@ export const tossUnlinkCallback = functions
       res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+/**
+ * 10. Suno API 콜백 (Webhook)
+ * - Suno API가 음악 생성 완료 시 호출
+ * - Firebase Storage에 음악 파일 업로드
+ * - Firestore에 트랙 메타데이터 저장
+ */
+export const sunoCallback = functions
+  .runWith({ timeoutSeconds: 120, memory: '1GB' })
+  .https.onRequest(async (req, res) => {
+    // POST 메서드만 허용
+    if (req.method !== 'POST') {
+      res.status(405).json({ error: 'Method Not Allowed' });
+      return;
+    }
+
+    try {
+      const callbackData = req.body;
+      console.log('[Suno Callback] 수신:', JSON.stringify(callbackData));
+
+      // Suno API 실제 콜백 데이터 구조:
+      // { code: 200, data: { callbackType: "complete", data: [...], task_id: "..." }, msg: "..." }
+      const taskId = callbackData.data?.task_id;
+      const callbackType = callbackData.data?.callbackType;
+      const responseData = callbackData.data?.data;
+
+      if (!taskId) {
+        console.error('[Suno Callback] taskId 없음');
+        res.status(400).json({ error: 'taskId is required' });
+        return;
+      }
+
+      console.log(`[Suno Callback] taskId: ${taskId}, callbackType: ${callbackType}`);
+
+      // pendingTasks에서 작업 정보 조회
+      const pendingTaskRef = db.collection('pendingTasks').doc(taskId);
+      const pendingTaskDoc = await pendingTaskRef.get();
+
+      if (!pendingTaskDoc.exists) {
+        console.error(`[Suno Callback] 작업 없음: ${taskId}`);
+        res.status(404).json({ error: 'Task not found' });
+        return;
+      }
+
+      const pendingTask = pendingTaskDoc.data()!;
+      const userId = pendingTask.userId;
+      const emotion = pendingTask.emotion;
+      const emotionText = pendingTask.emotionText;
+
+      // "complete" 콜백이고 오디오 URL이 있을 때만 저장
+      if (callbackType === 'complete' && responseData?.[0]?.audio_url) {
+        const audioInfo = responseData[0];
+
+        console.log(`[Suno Callback] 음악 다운로드 시작: ${audioInfo.audio_url}`);
+
+        // 음악 파일 다운로드
+        const audioResponse = await axios.get(audioInfo.audio_url, {
+          responseType: 'arraybuffer',
+          timeout: 60000,
+        });
+
+        // Firebase Storage에 업로드
+        const trackId = db.collection('tracks').doc().id;
+        const filePath = `tracks/${userId}/${trackId}.mp3`;
+        const bucket = storage.bucket();
+        const file = bucket.file(filePath);
+
+        await file.save(Buffer.from(audioResponse.data), {
+          metadata: {
+            contentType: 'audio/mpeg',
+            metadata: {
+              emotion,
+              userId,
+              trackId,
+            },
+          },
+        });
+
+        // 파일 공개 설정
+        await file.makePublic();
+        const audioUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+
+        // Firestore에 메타데이터 저장
+        const trackData: Track = {
+          id: trackId,
+          userId,
+          emotion: emotion as EmotionKeyword,
+          emotionText,
+          title: generateTitle(emotion as EmotionKeyword),
+          description: generateDescription(emotion as EmotionKeyword),
+          audioUrl,
+          albumArt: getAlbumArt(emotion as EmotionKeyword),
+          duration: audioInfo.duration || 60,
+          createdAt: admin.firestore.Timestamp.now(),
+          sunoTaskId: taskId,
+        };
+
+        await db.collection('tracks').doc(trackId).set(trackData);
+
+        // 사용자 통계 업데이트
+        await db.collection('users').doc(userId).update({
+          trackCount: admin.firestore.FieldValue.increment(1),
+        });
+
+        // pendingTask 완료 상태로 업데이트
+        await pendingTaskRef.update({
+          status: 'completed',
+          trackId,
+          updatedAt: admin.firestore.Timestamp.now(),
+        });
+
+        console.log(`[Suno Callback] 작업 완료: ${taskId}, trackId: ${trackId}`);
+        res.status(200).json({ success: true, status: 'completed', trackId });
+        return;
+      }
+
+      // 아직 진행 중인 상태 (text, first 콜백)
+      await pendingTaskRef.update({
+        status: callbackType || 'processing',
+        updatedAt: admin.firestore.Timestamp.now(),
+      });
+
+      console.log(`[Suno Callback] 진행 중: ${taskId}, callbackType: ${callbackType}`);
+      res.status(200).json({ success: true, status: callbackType || 'processing' });
+    } catch (error) {
+      console.error('[Suno Callback] 오류:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
+  });
 
 
 
