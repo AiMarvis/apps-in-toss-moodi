@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { auth, onAuthStateChanged, getUserInfoFn } from '../lib/firebase';
 import { signInWithToss } from '../lib/ensureAuth';
+import { restorePendingIapOrders } from '../lib/iapRestore';
 import type { User } from '../lib/firebase';
 
 interface AuthStore {
@@ -25,9 +26,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   initialize: () => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       set({ user: firebaseUser, loading: false, initialized: true });
-      
+
       if (firebaseUser) {
         get().refreshCredits();
+        // 미완료 주문 복원 (백그라운드에서 조용히 처리)
+        restorePendingIapOrders().catch(() => {
+          /* 복원 실패는 무시 - 다음 접속 시 재시도 */
+        });
       }
     });
     return unsubscribe;

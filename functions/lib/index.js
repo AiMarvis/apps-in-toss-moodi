@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sunoCallback = exports.tossUnlinkCallback = exports.loginWithToss = exports.getUserInfo = exports.createUser = exports.deleteTrack = exports.getMyTracks = exports.checkAndSaveMusic = exports.generateMusic = void 0;
+exports.grantCredits = exports.sunoCallback = exports.tossUnlinkCallback = exports.loginWithToss = exports.getUserInfo = exports.createUser = exports.deleteTrack = exports.getMyTracks = exports.checkAndSaveMusic = exports.generateMusic = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const params_1 = require("firebase-functions/params");
@@ -627,6 +627,61 @@ exports.sunoCallback = functions
     catch (error) {
         console.error('[Suno Callback] 오류:', error);
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+// SKU → 크레딧 매핑 (서버에서 검증)
+const SKU_CREDITS_MAP = {
+    'moodi.credit.10': 10,
+    'moodi.credit.33': 33,
+};
+/**
+ * 11. 인앱결제 크레딧 지급
+ * - orderId로 중복 지급 방지
+ * - SKU로 크레딧 수량 검증
+ * - 트랜잭션으로 크레딧 지급 + 주문 기록
+ */
+exports.grantCredits = functions.https.onCall(async (data, context) => {
+    var _a;
+    if (!context.auth) {
+        throw new functions.https.HttpsError('unauthenticated', '로그인이 필요해요');
+    }
+    const { orderId, sku } = data;
+    const userId = context.auth.uid;
+    // 1. SKU 유효성 검사
+    const creditsToGrant = SKU_CREDITS_MAP[sku];
+    if (!creditsToGrant) {
+        throw new functions.https.HttpsError('invalid-argument', '유효하지 않은 상품이에요');
+    }
+    // 2. 중복 지급 방지
+    const orderRef = db.collection('orders').doc(orderId);
+    const orderDoc = await orderRef.get();
+    if (orderDoc.exists && ((_a = orderDoc.data()) === null || _a === void 0 ? void 0 : _a.granted)) {
+        // 이미 지급됨 - 성공으로 응답 (멱등성 보장)
+        console.log(`[grantCredits] 이미 지급된 주문: ${orderId}`);
+        return { success: true, credits: creditsToGrant, alreadyGranted: true };
+    }
+    // 3. 트랜잭션으로 크레딧 지급 + 주문 기록
+    try {
+        await db.runTransaction(async (transaction) => {
+            const userRef = db.collection('users').doc(userId);
+            transaction.update(userRef, {
+                credits: admin.firestore.FieldValue.increment(creditsToGrant),
+            });
+            transaction.set(orderRef, {
+                orderId,
+                userId,
+                sku,
+                credits: creditsToGrant,
+                granted: true,
+                grantedAt: admin.firestore.Timestamp.now(),
+            });
+        });
+        console.log(`[grantCredits] ${userId}에게 ${creditsToGrant}크레딧 지급 완료 (주문: ${orderId})`);
+        return { success: true, credits: creditsToGrant };
+    }
+    catch (error) {
+        console.error('[grantCredits] 크레딧 지급 실패:', error);
+        throw new functions.https.HttpsError('internal', '크레딧 지급에 실패했어요. 다시 시도해주세요.');
     }
 });
 //# sourceMappingURL=index.js.map

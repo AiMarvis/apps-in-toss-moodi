@@ -244,3 +244,18 @@
   font-size: var(--font-size-small);
   color: var(--color-text-hint);
 }
+
+/* Section Notice */
+.section-notice {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-hint);
+  margin-top: var(--spacing-2);
+  padding-left: var(--spacing-2);
+  line-height: 1.4;
+}
+
+/* Menu Hint */
+.menu-hint {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-hint);
+}

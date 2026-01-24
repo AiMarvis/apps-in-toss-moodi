@@ -123,6 +123,19 @@ export interface TossUserInfoResponse {
   };
 }
 
+// 인앱결제 크레딧 지급 요청/응답 타입
+export interface GrantCreditsRequest {
+  orderId: string;
+  sku: string;
+  credits: number; // 클라이언트 전달값 (서버에서 SKU로 검증)
+}
+
+export interface GrantCreditsResponse {
+  success: boolean;
+  credits: number;
+  alreadyGranted?: boolean;
+}
+
 
 
 

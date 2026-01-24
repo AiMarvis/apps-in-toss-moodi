@@ -91,7 +91,22 @@ export const SettingsPage: React.FC = () => {
               </div>
               <span className="menu-arrow">→</span>
             </div>
+            <div className="menu-divider" />
+            <a
+              className="menu-item"
+              href="mailto:support@moodi.example.com?subject=환불 요청"
+            >
+              <div className="menu-icon">💳</div>
+              <div className="menu-content">
+                <span className="menu-label">환불 요청</span>
+                <span className="menu-hint">구매 후 7일 이내</span>
+              </div>
+              <span className="menu-arrow">→</span>
+            </a>
           </div>
+          <p className="section-notice">
+            구매 후 7일 이내, 미사용 크레딧에 한해 환불 가능해요
+          </p>
         </section>
 
         {/* App Info Section */}
