@@ -53,7 +53,7 @@ export const generateMusic = functions
     }
 
     const userId = context.auth.uid;
-    const { emotion, text } = data;
+    const { emotion, text, instrumental, musicType } = data;
 
     // 감정 키워드 유효성 검사
     const validEmotions: EmotionKeyword[] = ['sad', 'anxious', 'angry', 'depressed', 'tired', 'calm'];
@@ -77,8 +77,8 @@ export const generateMusic = functions
     }
 
     try {
-      // 음악 프롬프트 생성
-      const prompt = buildMusicPrompt(emotion, text);
+      // 음악 프롬프트 생성 (스타일 및 가사 힌트 반영)
+      const prompt = buildMusicPrompt(emotion, text, musicType, instrumental);
 
       // Suno API 호출 (콜백 URL 포함)
       const callBackUrl = 'https://us-central1-moodi-b8811.cloudfunctions.net/sunoCallback';
@@ -87,9 +87,10 @@ export const generateMusic = functions
         {
           prompt,
           model: 'V4_5ALL',
-          instrumental: false,
+          instrumental: instrumental ?? false,
           customMode: false,
           callBackUrl,
+          count: 1,
         },
         {
           headers: {

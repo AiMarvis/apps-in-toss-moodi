@@ -53,6 +53,12 @@
 .track-description {
   font-size: var(--font-size-body);
   color: var(--color-text-sub);
+  margin-bottom: var(--spacing-2);
+}
+
+.ai-generated-notice {
+  font-size: var(--font-size-caption);
+  color: var(--color-text-hint);
   margin-bottom: var(--spacing-3);
 }
 

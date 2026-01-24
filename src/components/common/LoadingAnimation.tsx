@@ -9,8 +9,8 @@ interface LoadingAnimationProps {
 
 // 로딩 메시지 목록 (PRD 4.1.5, UX 대기 시간 처리)
 const LOADING_MESSAGES = [
-  { message: '당신의 감정을 음악으로 바꾸고 있어요', submessage: '조금만 기다려 주세요...' },
-  { message: '멜로디를 만들고 있어요', submessage: '음표들이 모이고 있어요' },
+  { message: '당신의 감정을 음악으로 바꾸고 있어요', submessage: 'AI가 곡을 생성 중이에요 (최대 5분 소요)' },
+  { message: '멜로디를 만들고 있어요', submessage: 'AI가 음표들을 모으고 있어요' },
   { message: '화음을 더하고 있어요', submessage: '거의 다 됐어요!' },
   { message: '마지막 손질을 하고 있어요', submessage: '곧 완성이에요' },
 ];

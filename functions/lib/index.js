@@ -69,7 +69,7 @@ exports.generateMusic = functions
         throw new functions.https.HttpsError('unauthenticated', '로그인이 필요해요');
     }
     const userId = context.auth.uid;
-    const { emotion, text } = data;
+    const { emotion, text, instrumental, musicType } = data;
     // 감정 키워드 유효성 검사
     const validEmotions = ['sad', 'anxious', 'angry', 'depressed', 'tired', 'calm'];
     if (!validEmotions.includes(emotion)) {
@@ -87,16 +87,17 @@ exports.generateMusic = functions
         throw new functions.https.HttpsError('resource-exhausted', '크레딧이 부족해요. 내일 다시 시도해주세요!');
     }
     try {
-        // 음악 프롬프트 생성
-        const prompt = (0, generators_1.buildMusicPrompt)(emotion, text);
+        // 음악 프롬프트 생성 (스타일 및 가사 힌트 반영)
+        const prompt = (0, generators_1.buildMusicPrompt)(emotion, text, musicType, instrumental);
         // Suno API 호출 (콜백 URL 포함)
         const callBackUrl = 'https://us-central1-moodi-b8811.cloudfunctions.net/sunoCallback';
         const sunoResponse = await axios_1.default.post(`${SUNO_API_BASE}/api/v1/generate`, {
             prompt,
             model: 'V4_5ALL',
-            instrumental: false,
+            instrumental: instrumental !== null && instrumental !== void 0 ? instrumental : false,
             customMode: false,
             callBackUrl,
+            count: 1,
         }, {
             headers: {
                 'Authorization': `Bearer ${SUNO_API_KEY.value().trim()}`,

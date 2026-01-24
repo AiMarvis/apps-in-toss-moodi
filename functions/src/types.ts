@@ -46,6 +46,8 @@ export interface SunoStatusResponse {
 export interface GenerateMusicRequest {
   emotion: EmotionKeyword;
   text?: string;
+  instrumental?: boolean;
+  musicType?: string;
 }
 
 export interface GenerateMusicResponse {

@@ -12,14 +12,14 @@ interface MusicGenerationState {
   progress: number;
   track: Track | null;
   error: string | null;
-  generate: (emotion: EmotionKeyword, text?: string) => Promise<void>;
+  generate: (emotion: EmotionKeyword, text?: string, instrumental?: boolean, musicType?: string) => Promise<void>;
   reset: () => void;
 }
 
 // 폴링 간격 (ms)
 const POLLING_INTERVAL = 3000;
-// 최대 폴링 횟수 (90초 타임아웃)
-const MAX_POLLING_COUNT = 30;
+// 최대 폴링 횟수 (300초 = 5분 타임아웃)
+const MAX_POLLING_COUNT = 100;
 
 /**
  * 음악 생성 Hook
@@ -102,7 +102,7 @@ export function useMusicGeneration(): MusicGenerationState {
   );
 
   const generate = useCallback(
-    async (emotion: EmotionKeyword, text?: string) => {
+    async (emotion: EmotionKeyword, text?: string, instrumental?: boolean, musicType?: string) => {
       clearPolling();
       setStatus('generating');
       setProgress(10);
@@ -112,7 +112,7 @@ export function useMusicGeneration(): MusicGenerationState {
       try {
         await ensureAuth();
 
-        const { taskId } = await generateMusic({ emotion, text });
+        const { taskId } = await generateMusic({ emotion, text, instrumental, musicType });
 
         useAuthStore.getState().decrementCredits();
 

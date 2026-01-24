@@ -31,6 +31,7 @@ export const HomePage: React.FC = () => {
   const [selectedEmotion, setSelectedEmotion] = useState<EmotionKeyword | null>(null);
   const [selectedMusicType, setSelectedMusicType] = useState<string | null>(null);
   const [emotionText, setEmotionText] = useState('');
+  const [hasLyrics, setHasLyrics] = useState(true);
 
   const canGenerate = selectedEmotion !== null && credits > 0;
 
@@ -43,6 +44,7 @@ export const HomePage: React.FC = () => {
         emotion: selectedEmotion,
         musicType: selectedMusicType,
         emotionText: emotionText.trim() || undefined,
+        instrumental: !hasLyrics,
       },
     });
   };
@@ -100,6 +102,31 @@ export const HomePage: React.FC = () => {
                 <span>{type.label}</span>
               </button>
             ))}
+          </div>
+        </section>
+
+        {/* Lyrics Selection */}
+        <section className="lyrics-section home-card">
+          <h3 className="section-label">
+            가사가 포함된 음악을 원하시나요?
+          </h3>
+          <div className="lyrics-options">
+            <button
+              className={`lyrics-option ${hasLyrics ? 'selected' : ''} ${credits <= 0 ? 'disabled' : ''}`}
+              onClick={() => setHasLyrics(true)}
+              disabled={credits <= 0}
+            >
+              <span className="lyrics-emoji">🎤</span>
+              <span className="lyrics-label">가사 포함</span>
+            </button>
+            <button
+              className={`lyrics-option ${!hasLyrics ? 'selected' : ''} ${credits <= 0 ? 'disabled' : ''}`}
+              onClick={() => setHasLyrics(false)}
+              disabled={credits <= 0}
+            >
+              <span className="lyrics-emoji">🎵</span>
+              <span className="lyrics-label">연주곡</span>
+            </button>
           </div>
         </section>
 

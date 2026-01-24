@@ -10,6 +10,26 @@ const EMOTION_PROMPTS: Record<EmotionKeyword, string> = {
   calm: 'peaceful acoustic guitar with nature ambience, serene and meditative',
 };
 
+// 음악 스타일별 프롬프트 매핑
+const MUSIC_STYLE_PROMPTS: Record<string, string> = {
+  calm: 'calm and peaceful, gentle tempo, soft dynamics',
+  upbeat: 'upbeat and energetic, fast tempo, lively rhythm',
+  dramatic: 'dramatic and cinematic, dynamic changes, orchestral elements',
+  jazz: 'jazz style, smooth saxophone, walking bass, swing rhythm',
+  classical: 'classical style, orchestral arrangement, elegant strings',
+  lofi: 'lo-fi hip hop, mellow beats, vinyl crackle, chill vibes',
+};
+
+// 감정별 가사 힌트 (가사 포함 시 사용)
+const EMOTION_LYRICS_HINTS: Record<EmotionKeyword, string> = {
+  sad: 'with heartfelt lyrics about loss and longing',
+  anxious: 'with calming lyrics about finding peace and comfort',
+  angry: 'with powerful lyrics about overcoming frustration',
+  depressed: 'with hopeful lyrics about light in darkness',
+  tired: 'with soothing lyrics about rest and relaxation',
+  calm: 'with gentle lyrics about serenity and contentment',
+};
+
 // 감정별 제목 생성
 const EMOTION_TITLES: Record<EmotionKeyword, string[]> = {
   sad: ['비 오는 날의 멜로디', '눈물의 위로', '슬픔을 담은 노래'],
@@ -43,16 +63,39 @@ const ALBUM_ART_MAP: Record<EmotionKeyword, string> = {
 
 /**
  * 감정과 텍스트를 기반으로 음악 생성 프롬프트 생성
+ * @param emotion - 감정 키워드
+ * @param text - 사용자 입력 텍스트 (선택)
+ * @param musicType - 음악 스타일 (선택)
+ * @param instrumental - 연주곡 여부 (true면 가사 힌트 제외)
  */
-export function buildMusicPrompt(emotion: EmotionKeyword, text?: string): string {
+export function buildMusicPrompt(
+  emotion: EmotionKeyword,
+  text?: string,
+  musicType?: string,
+  instrumental?: boolean
+): string {
   const basePrompt = EMOTION_PROMPTS[emotion];
-  
-  if (!text || text.trim() === '') {
-    return basePrompt;
+  const stylePrompt = musicType ? MUSIC_STYLE_PROMPTS[musicType] : '';
+  const lyricsHint = !instrumental ? EMOTION_LYRICS_HINTS[emotion] : '';
+
+  let prompt = basePrompt;
+
+  // 스타일 추가 (스타일이 있으면 맨 앞에)
+  if (stylePrompt) {
+    prompt = `${stylePrompt}, ${prompt}`;
   }
-  
-  // 텍스트가 있으면 추가 컨텍스트로 활용
-  return `${basePrompt}, inspired by the feeling: "${text.substring(0, 100)}"`;
+
+  // 가사 힌트 추가 (가사 포함 시)
+  if (lyricsHint) {
+    prompt = `${prompt}, ${lyricsHint}`;
+  }
+
+  // 사용자 텍스트 추가
+  if (text?.trim()) {
+    prompt = `${prompt}, inspired by the feeling: "${text.substring(0, 100)}"`;
+  }
+
+  return prompt;
 }
 
 /**

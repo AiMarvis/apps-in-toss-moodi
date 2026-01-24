@@ -147,6 +147,57 @@
   pointer-events: none;
 }
 
+/* Lyrics Selection */
+.lyrics-section {
+  animation: fadeIn 0.5s ease-out 0.17s both;
+}
+
+.lyrics-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.lyrics-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 20px 16px;
+  border-radius: 16px;
+  background: #f3f4f6;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.lyrics-option:active {
+  transform: scale(0.96);
+}
+
+.lyrics-option.selected {
+  background: #eef6ff;
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px -2px rgba(49, 131, 246, 0.3);
+}
+
+.lyrics-option.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.lyrics-emoji {
+  font-size: 24px;
+}
+
+.lyrics-label {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
 .emotion-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

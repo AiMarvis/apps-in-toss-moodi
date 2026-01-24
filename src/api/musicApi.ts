@@ -4,6 +4,8 @@ import type { EmotionKeyword, Track } from '../types/emotion';
 export interface GenerateMusicParams {
   emotion: EmotionKeyword;
   text?: string;
+  instrumental?: boolean;
+  musicType?: string;
 }
 
 export interface GenerateMusicResult {

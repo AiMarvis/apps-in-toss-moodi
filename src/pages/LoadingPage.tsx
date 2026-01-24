@@ -8,6 +8,8 @@ import './LoadingPage.css';
 interface LocationState {
   emotion: EmotionKeyword;
   emotionText?: string;
+  instrumental?: boolean;
+  musicType?: string;
 }
 
 /**
@@ -31,8 +33,8 @@ export const LoadingPage: React.FC = () => {
       return;
     }
 
-    // 음악 생성 시작
-    generate(state.emotion, state.emotionText);
+    // 음악 생성 시작 (musicType 포함)
+    generate(state.emotion, state.emotionText, state.instrumental, state.musicType);
 
     // 클린업
     return () => {
@@ -54,7 +56,7 @@ export const LoadingPage: React.FC = () => {
   const handleRetry = () => {
     if (state?.emotion) {
       reset();
-      generate(state.emotion, state.emotionText);
+      generate(state.emotion, state.emotionText, state.instrumental, state.musicType);
     }
   };
 

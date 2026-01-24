@@ -92,6 +92,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
       <div className="track-info">
         <h2 className="track-title">{track.title}</h2>
         <p className="track-description">{track.description}</p>
+        <p className="ai-generated-notice">🤖 생성형 AI로 만든 곡입니다</p>
         {emotion && (
           <span className="track-emotion-tag" style={{ backgroundColor: emotion.color }}>
             {emotion.emoji} {emotion.label}
