@@ -6,5 +6,9 @@
       "Bash(python:*)",
       "Bash(unzip:*)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "stitch"
+  ],
+  "enableAllProjectMcpServers": true
 }
