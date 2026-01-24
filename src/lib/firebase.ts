@@ -123,3 +123,21 @@ export const loginWithTossFn = httpsCallable<TossLoginRequest, TossLoginResponse
   'loginWithToss'
 );
 
+// 인앱결제 크레딧 지급 타입
+interface GrantCreditsRequest {
+  orderId: string;
+  sku: string;
+  credits: number;
+}
+
+interface GrantCreditsResponse {
+  success: boolean;
+  credits?: number;
+}
+
+// 크레딧 지급 Callable Function
+export const grantCreditsFn = httpsCallable<GrantCreditsRequest, GrantCreditsResponse>(
+  functions,
+  'grantCredits'
+);
+

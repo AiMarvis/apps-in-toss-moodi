@@ -1,0 +1,37 @@
+.async-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-10) var(--spacing-6);
+  text-align: center;
+  gap: var(--spacing-3);
+}
+
+.async-spinner {
+  font-size: 40px;
+  animation: spin 1s linear infinite;
+}
+
+.async-icon {
+  font-size: 48px;
+}
+
+.async-state p {
+  font-size: var(--font-size-body);
+  color: var(--color-text-sub);
+}
+
+.retry-button {
+  margin-top: var(--spacing-3);
+  padding: var(--spacing-3) var(--spacing-5);
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-button);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-semibold);
+}
+
+.retry-button:active {
+  background-color: var(--color-primary-dark);
+}

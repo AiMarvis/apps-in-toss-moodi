@@ -28,3 +28,20 @@ export const ALBUM_ART_MAP: Record<EmotionKeyword, string> = {
 // 일일 무료 크레딧
 export const DAILY_CREDITS = 5;
 
+// 크레딧 상품 타입 (인앱결제용)
+export interface CreditProduct {
+  id: string;
+  sku: string;
+  name: string;
+  credits: number;
+  price: string;
+  popular?: boolean;
+}
+
+// 크레딧 상품 목록
+export const CREDIT_PRODUCTS: CreditProduct[] = [
+  { id: 'small', sku: 'moodi_credits_10', name: '크레딧 10개', credits: 10, price: '₩1,000' },
+  { id: 'medium', sku: 'moodi_credits_30', name: '크레딧 30개', credits: 30, price: '₩2,500', popular: true },
+  { id: 'large', sku: 'moodi_credits_100', name: '크레딧 100개', credits: 100, price: '₩7,000' },
+];
+

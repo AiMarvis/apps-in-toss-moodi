@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
-import { getMyTracksFn, deleteTrackFn } from '../lib/firebase';
+import { getMyTracks, deleteTrack as deleteTrackApi } from '../api/trackApi';
 import { ensureAuth } from '../lib/ensureAuth';
+import { getErrorMessage, isAuthError } from '../utils/errorHandler';
 import type { Track } from '../types/emotion';
 
 interface MyTracksState {
@@ -36,12 +37,12 @@ export function useMyTracks(): MyTracksState {
       // Lazy Auth: Firebase 기능 사용 전 인증 보장
       await ensureAuth();
 
-      const result = await getMyTracksFn({
+      const result = await getMyTracks({
         limit: PAGE_SIZE,
         startAfter: reset ? undefined : lastTrackId,
       });
 
-      const newTracks = result.data.tracks;
+      const newTracks = result.tracks;
 
       if (reset) {
         setTracks(newTracks);
@@ -57,16 +58,10 @@ export function useMyTracks(): MyTracksState {
         setLastTrackId(newTracks[newTracks.length - 1].id);
       }
     } catch (err) {
-      console.error('트랙 목록 조회 실패:', err);
-      if (err && typeof err === 'object' && 'message' in err) {
-        const errorMessage = (err as { message: string }).message;
-        if (errorMessage.includes('로그인')) {
-          setError('로그인에 실패했어요. 다시 시도해주세요.');
-        } else {
-          setError('음악 목록을 불러오지 못했어요.');
-        }
+      if (isAuthError(err)) {
+        setError('로그인에 실패했어요. 다시 시도해주세요.');
       } else {
-      setError('음악 목록을 불러오지 못했어요.');
+        setError(getErrorMessage(err));
       }
     } finally {
       setLoading(false);
@@ -86,14 +81,13 @@ export function useMyTracks(): MyTracksState {
       // Lazy Auth: Firebase 기능 사용 전 인증 보장
       await ensureAuth();
 
-      await deleteTrackFn({ trackId });
+      await deleteTrackApi(trackId);
       
       // 로컬 상태에서도 제거
       setTracks((prev) => prev.filter((t) => t.id !== trackId));
       
       return true;
     } catch (err) {
-      console.error('트랙 삭제 실패:', err);
       setError('삭제에 실패했어요.');
       return false;
     }

@@ -1,6 +1,8 @@
 import { useState, useCallback, useRef } from 'react';
-import { generateMusicFn, checkAndSaveMusicFn } from '../lib/firebase';
+import { generateMusic, checkAndSaveMusic } from '../api/musicApi';
 import { ensureAuth } from '../lib/ensureAuth';
+import { getErrorMessage, isCreditError, isAuthError } from '../utils/errorHandler';
+import { useAuthStore } from '../stores/authStore';
 import type { EmotionKeyword, Track } from '../types/emotion';
 
 type GenerationStatus = 'idle' | 'generating' | 'processing' | 'complete' | 'error';
@@ -52,17 +54,14 @@ export function useMusicGeneration(): MusicGenerationState {
     setError(null);
   }, [clearPolling]);
 
-  // 상태 확인 및 저장
   const checkStatus = useCallback(
     async (taskId: string, emotion: EmotionKeyword, emotionText?: string) => {
       try {
-        const result = await checkAndSaveMusicFn({
+        const data = await checkAndSaveMusic({
           taskId,
           emotion,
           emotionText,
         });
-
-        const data = result.data;
 
         if (data.status === 'complete' && data.track) {
           // 완료
@@ -94,19 +93,16 @@ export function useMusicGeneration(): MusicGenerationState {
           }, POLLING_INTERVAL);
         }
       } catch (err) {
-        console.error('상태 확인 실패:', err);
         setStatus('error');
-        setError('상태 확인에 실패했어요. 다시 시도해주세요.');
+        setError(getErrorMessage(err));
         clearPolling();
       }
     },
     [clearPolling]
   );
 
-  // 음악 생성 시작
   const generate = useCallback(
     async (emotion: EmotionKeyword, text?: string) => {
-      // 초기화
       clearPolling();
       setStatus('generating');
       setProgress(10);
@@ -114,37 +110,27 @@ export function useMusicGeneration(): MusicGenerationState {
       setError(null);
 
       try {
-        // Lazy Auth: Firebase 기능 사용 전 인증 보장
         await ensureAuth();
 
-        // 생성 요청
-        const result = await generateMusicFn({ emotion, text });
-        const { taskId } = result.data;
+        const { taskId } = await generateMusic({ emotion, text });
 
-        // 상태를 processing으로 변경
+        useAuthStore.getState().decrementCredits();
+
         setStatus('processing');
         setProgress(20);
 
-        // 폴링 시작
         pollingRef.current = setTimeout(() => {
           checkStatus(taskId, emotion, text);
         }, POLLING_INTERVAL);
       } catch (err: unknown) {
-        console.error('음악 생성 요청 실패:', err);
         setStatus('error');
         
-        // 에러 메시지 추출
-        if (err && typeof err === 'object' && 'message' in err) {
-          const errorMessage = (err as { message: string }).message;
-          if (errorMessage.includes('크레딧')) {
-            setError('크레딧이 부족해요. 내일 다시 시도해주세요!');
-          } else if (errorMessage.includes('로그인')) {
-            setError('로그인에 실패했어요. 다시 시도해주세요.');
-          } else {
-            setError('음악 생성에 실패했어요. 다시 시도해주세요.');
-          }
+        if (isCreditError(err)) {
+          setError('크레딧이 부족해요. 내일 다시 시도해주세요!');
+        } else if (isAuthError(err)) {
+          setError('로그인에 실패했어요. 다시 시도해주세요.');
         } else {
-          setError('음악 생성에 실패했어요. 다시 시도해주세요.');
+          setError(getErrorMessage(err));
         }
       }
     },

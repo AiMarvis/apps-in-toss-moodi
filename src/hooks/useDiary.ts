@@ -11,6 +11,7 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { db, auth } from '../lib/firebase';
+import { getErrorMessage } from '../utils/errorHandler';
 import type { DiaryEntry, CreateDiaryRequest } from '../types/diary';
 
 interface DiaryState {
@@ -76,8 +77,7 @@ export function useDiary(): UseDiaryReturn {
 
       setDiaries(fetchedDiaries);
     } catch (err) {
-      console.error('다이어리 조회 실패:', err);
-      setError('다이어리를 불러오는데 실패했어요.');
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -110,8 +110,7 @@ export function useDiary(): UseDiaryReturn {
           updatedAt: data.updatedAt?.toDate() || new Date(),
         };
       });
-    } catch (err) {
-      console.error('날짜별 다이어리 조회 실패:', err);
+    } catch {
       return [];
     }
   }, []);
@@ -147,8 +146,7 @@ export function useDiary(): UseDiaryReturn {
 
       setDiaries(prev => [newDiary, ...prev]);
       return newDiary;
-    } catch (err) {
-      console.error('다이어리 저장 실패:', err);
+    } catch {
       setError('다이어리 저장에 실패했어요.');
       return null;
     }
@@ -159,8 +157,7 @@ export function useDiary(): UseDiaryReturn {
       await deleteDoc(doc(db, 'diaries', id));
       setDiaries(prev => prev.filter(d => d.id !== id));
       return true;
-    } catch (err) {
-      console.error('다이어리 삭제 실패:', err);
+    } catch {
       setError('다이어리 삭제에 실패했어요.');
       return false;
     }

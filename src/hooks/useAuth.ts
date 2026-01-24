@@ -1,6 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
-import { auth, onAuthStateChanged } from '../lib/firebase';
-import { signInWithToss } from '../lib/ensureAuth';
+import { useAuthStore } from '../stores/authStore';
 import type { User } from '../lib/firebase';
 
 interface AuthState {
@@ -12,43 +10,16 @@ interface AuthState {
 }
 
 export function useAuth(): AuthState {
-  const [user, setUser] = useState<User | null>(auth.currentUser);
-  const [loading, setLoading] = useState(true);
+  const user = useAuthStore((state) => state.user);
+  const loading = useAuthStore((state) => state.loading);
+  const login = useAuthStore((state) => state.login);
+  const logout = useAuthStore((state) => state.logout);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-      setUser(firebaseUser);
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
-
-  const login = useCallback(async (): Promise<boolean> => {
-    setLoading(true);
-    try {
-      const loggedInUser = await signInWithToss();
-      setLoading(false);
-      return loggedInUser !== null;
-    } catch (err) {
-      console.error('[useAuth] 로그인 실패:', err);
-      setLoading(false);
-      return false;
-    }
-  }, []);
-
-  const logout = useCallback(async (): Promise<void> => {
-    try {
-      await auth.signOut();
-    } catch (err) {
-      console.error('[useAuth] 로그아웃 실패:', err);
-    }
-  }, []);
-
-  return { 
-    user, 
-    loading, 
+  return {
+    user,
+    loading,
     isLoggedIn: user !== null,
     login,
-    logout
+    logout,
   };
 }

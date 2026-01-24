@@ -1,24 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrackItem } from '../components/common/TrackItem';
+import { ConfirmModal } from '../components/common/ConfirmModal';
 import { useMyTracks } from '../hooks/useMyTracks';
 import './LibraryPage.css';
 
-/**
- * 라이브러리 페이지 - 내 음악 목록 (계획 LibraryPage)
- * - 저장된 트랙 목록
- * - 삭제 기능
- * - 무한 스크롤
- */
 export const LibraryPage: React.FC = () => {
   const navigate = useNavigate();
   const { tracks, loading, error, hasMore, fetchTracks, deleteTrack, refetch } = useMyTracks();
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
-  // 초기 로드
-  useEffect(() => {
+  const handleInitialFetch = useCallback(() => {
     fetchTracks(true);
-  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
+  }, [fetchTracks]);
+
+  useEffect(() => {
+    handleInitialFetch();
+  }, [handleInitialFetch]);
 
   const handleTrackClick = (track: typeof tracks[0]) => {
     navigate('/player', { state: { track } });
@@ -49,7 +47,6 @@ export const LibraryPage: React.FC = () => {
 
   return (
     <div className="library-page">
-      {/* Header */}
       <header className="library-header">
         <h1 className="library-title">내 음악</h1>
         <button className="refresh-button" onClick={refetch} disabled={loading}>
@@ -57,9 +54,7 @@ export const LibraryPage: React.FC = () => {
         </button>
       </header>
 
-      {/* Content */}
       <main className="library-content">
-        {/* Loading Initial */}
         {loading && tracks.length === 0 && (
           <div className="loading-state">
             <span className="loading-spinner">🎵</span>
@@ -67,7 +62,6 @@ export const LibraryPage: React.FC = () => {
           </div>
         )}
 
-        {/* Error */}
         {error && tracks.length === 0 && (
           <div className="error-state">
             <span className="error-icon">😔</span>
@@ -78,7 +72,6 @@ export const LibraryPage: React.FC = () => {
           </div>
         )}
 
-        {/* Empty State */}
         {!loading && !error && tracks.length === 0 && (
           <div className="empty-state">
             <span className="empty-icon">🎶</span>
@@ -90,7 +83,6 @@ export const LibraryPage: React.FC = () => {
           </div>
         )}
 
-        {/* Track List */}
         {tracks.length > 0 && (
           <div className="track-list">
             {tracks.map((track) => (
@@ -103,7 +95,6 @@ export const LibraryPage: React.FC = () => {
               />
             ))}
 
-            {/* Load More */}
             {hasMore && (
               <button
                 className="load-more-button"
@@ -117,43 +108,16 @@ export const LibraryPage: React.FC = () => {
         )}
       </main>
 
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm && (
-        <div className="modal-overlay" onClick={handleCancelDelete}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3 className="modal-title">음악을 삭제할까요?</h3>
-            <p className="modal-message">삭제된 음악은 복구할 수 없어요.</p>
-            <div className="modal-actions">
-              <button className="modal-cancel" onClick={handleCancelDelete}>
-                취소
-              </button>
-              <button className="modal-confirm" onClick={handleConfirmDelete}>
-                삭제하기
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        isOpen={deleteConfirm !== null}
+        title="음악을 삭제할까요?"
+        message="삭제된 음악은 복구할 수 없어요."
+        confirmText="삭제하기"
+        cancelText="취소"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        variant="danger"
+      />
     </div>
   );
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

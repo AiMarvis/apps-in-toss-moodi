@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import MoodiCharacter from '../assets/moodi-character.svg';
+import MoodiLoading from '../assets/moodi-loading.png';
 import './SplashPage.css';
 
 const SPLASH_DURATION_MS = 2500;
@@ -41,7 +41,7 @@ export const SplashPage: React.FC = () => {
 
         <div className="splash-character">
           <img 
-            src={MoodiCharacter} 
+            src={MoodiLoading} 
             alt="Moodi 캐릭터" 
             className="character-image"
           />

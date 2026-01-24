@@ -145,9 +145,9 @@
 }
 
 .character-image {
-  width: 180px;
-  height: 180px;
-  filter: drop-shadow(0 0 30px rgba(56, 189, 248, 0.4));
+  width: 210px;
+  height: auto;
+  filter: drop-shadow(0 0 20px rgba(244, 114, 182, 0.4)) drop-shadow(0 0 40px rgba(45, 212, 191, 0.3));
 }
 
 @keyframes characterBreathing {
@@ -155,7 +155,7 @@
     transform: translateY(0) scale(1);
   }
   50% {
-    transform: translateY(-8px) scale(1.03);
+    transform: translateY(-12px) scale(1.05);
   }
 }
 
