@@ -85,6 +85,14 @@
   border-radius: var(--radius-full);
   overflow: hidden;
   margin-bottom: var(--spacing-2);
+  cursor: pointer;
+  touch-action: none;
+  transition: height 0.1s ease;
+}
+
+.progress-bar:hover,
+.progress-bar:active {
+  height: 8px;
 }
 
 .progress-fill {

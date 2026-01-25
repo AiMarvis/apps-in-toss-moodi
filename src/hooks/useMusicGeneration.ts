@@ -12,7 +12,7 @@ interface MusicGenerationState {
   progress: number;
   track: Track | null;
   error: string | null;
-  generate: (emotion: EmotionKeyword, text?: string, instrumental?: boolean, musicType?: string) => Promise<void>;
+  generate: (emotion: EmotionKeyword, text?: string, instrumental?: boolean, musicType?: string, lyricsLanguage?: 'ko' | 'en') => Promise<void>;
   reset: () => void;
 }
 
@@ -102,7 +102,7 @@ export function useMusicGeneration(): MusicGenerationState {
   );
 
   const generate = useCallback(
-    async (emotion: EmotionKeyword, text?: string, instrumental?: boolean, musicType?: string) => {
+    async (emotion: EmotionKeyword, text?: string, instrumental?: boolean, musicType?: string, lyricsLanguage?: 'ko' | 'en') => {
       clearPolling();
       setStatus('generating');
       setProgress(10);
@@ -112,7 +112,7 @@ export function useMusicGeneration(): MusicGenerationState {
       try {
         await ensureAuth();
 
-        const { taskId } = await generateMusic({ emotion, text, instrumental, musicType });
+        const { taskId } = await generateMusic({ emotion, text, instrumental, musicType, lyricsLanguage });
 
         useAuthStore.getState().decrementCredits();
 

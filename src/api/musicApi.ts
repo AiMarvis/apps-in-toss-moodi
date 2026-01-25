@@ -6,6 +6,7 @@ export interface GenerateMusicParams {
   text?: string;
   instrumental?: boolean;
   musicType?: string;
+  lyricsLanguage?: 'ko' | 'en';
 }
 
 export interface GenerateMusicResult {

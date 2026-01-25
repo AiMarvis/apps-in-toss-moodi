@@ -20,14 +20,24 @@ const MUSIC_STYLE_PROMPTS: Record<string, string> = {
   lofi: 'lo-fi hip hop, mellow beats, vinyl crackle, chill vibes',
 };
 
-// 감정별 가사 힌트 (가사 포함 시 사용)
-const EMOTION_LYRICS_HINTS: Record<EmotionKeyword, string> = {
-  sad: 'with heartfelt lyrics about loss and longing',
-  anxious: 'with calming lyrics about finding peace and comfort',
-  angry: 'with powerful lyrics about overcoming frustration',
-  depressed: 'with hopeful lyrics about light in darkness',
-  tired: 'with soothing lyrics about rest and relaxation',
-  calm: 'with gentle lyrics about serenity and contentment',
+// 한국어 가사 힌트
+const EMOTION_LYRICS_HINTS_KO: Record<EmotionKeyword, string> = {
+  sad: 'with heartfelt Korean vocals (한국어 가사) singing about 슬픔과 그리움',
+  anxious: 'with calming Korean vocals (한국어 가사) singing about 평화와 위안',
+  angry: 'with powerful Korean vocals (한국어 가사) singing about 분노 극복',
+  depressed: 'with hopeful Korean vocals (한국어 가사) singing about 어둠 속 희망',
+  tired: 'with soothing Korean vocals (한국어 가사) singing about 휴식과 안정',
+  calm: 'with gentle Korean vocals (한국어 가사) singing about 평온과 만족',
+};
+
+// 영어 가사 힌트
+const EMOTION_LYRICS_HINTS_EN: Record<EmotionKeyword, string> = {
+  sad: 'with heartfelt English vocals about loss and longing',
+  anxious: 'with calming English vocals about finding peace and comfort',
+  angry: 'with powerful English vocals about overcoming frustration',
+  depressed: 'with hopeful English vocals about light in darkness',
+  tired: 'with soothing English vocals about rest and relaxation',
+  calm: 'with gentle English vocals about serenity and contentment',
 };
 
 // 감정별 제목 생성
@@ -72,11 +82,17 @@ export function buildMusicPrompt(
   emotion: EmotionKeyword,
   text?: string,
   musicType?: string,
-  instrumental?: boolean
+  instrumental?: boolean,
+  lyricsLanguage?: 'ko' | 'en'
 ): string {
   const basePrompt = EMOTION_PROMPTS[emotion];
   const stylePrompt = musicType ? MUSIC_STYLE_PROMPTS[musicType] : '';
-  const lyricsHint = !instrumental ? EMOTION_LYRICS_HINTS[emotion] : '';
+  let lyricsHint = '';
+  if (!instrumental) {
+    lyricsHint = lyricsLanguage === 'ko'
+      ? EMOTION_LYRICS_HINTS_KO[emotion]
+      : EMOTION_LYRICS_HINTS_EN[emotion];
+  }
 
   let prompt = basePrompt;
 

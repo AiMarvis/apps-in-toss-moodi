@@ -53,7 +53,7 @@ export const generateMusic = functions
     }
 
     const userId = context.auth.uid;
-    const { emotion, text, instrumental, musicType } = data;
+    const { emotion, text, instrumental, musicType, lyricsLanguage } = data;
 
     // 감정 키워드 유효성 검사
     const validEmotions: EmotionKeyword[] = ['sad', 'anxious', 'angry', 'depressed', 'tired', 'calm'];
@@ -78,28 +78,61 @@ export const generateMusic = functions
 
     try {
       // 음악 프롬프트 생성 (스타일 및 가사 힌트 반영)
-      const prompt = buildMusicPrompt(emotion, text, musicType, instrumental);
+      let prompt = buildMusicPrompt(emotion, text, musicType, instrumental, lyricsLanguage);
 
       // Suno API 호출 (콜백 URL 포함)
       const callBackUrl = 'https://us-central1-moodi-b8811.cloudfunctions.net/sunoCallback';
-      const sunoResponse = await axios.post(
-        `${SUNO_API_BASE}/api/v1/generate`,
-        {
-          prompt,
-          model: 'V4_5ALL',
-          instrumental: instrumental ?? false,
-          customMode: false,
-          callBackUrl,
-          count: 1,
-        },
-        {
-          headers: {
-            'Authorization': `Bearer ${SUNO_API_KEY.value().trim()}`,
-            'Content-Type': 'application/json',
+
+      let sunoResponse;
+      try {
+        sunoResponse = await axios.post(
+          `${SUNO_API_BASE}/api/v1/generate`,
+          {
+            prompt,
+            model: 'V4_5ALL',
+            instrumental: instrumental ?? false,
+            customMode: !instrumental,
+            callBackUrl,
+            count: 1,
           },
-          timeout: 30000,
+          {
+            headers: {
+              'Authorization': `Bearer ${SUNO_API_KEY.value().trim()}`,
+              'Content-Type': 'application/json',
+            },
+            timeout: 30000,
+          }
+        );
+      } catch (apiError: unknown) {
+        // 아티스트 이름 오인식 에러 시 사용자 텍스트 제외하고 재시도
+        const axiosError = apiError as { response?: { status?: number; data?: { msg?: string } } };
+        if (axiosError.response?.status === 400 &&
+            axiosError.response?.data?.msg?.includes('artist name')) {
+          console.log('[Fallback] 아티스트 이름 오인식으로 재시도 (텍스트 제외)');
+          prompt = buildMusicPrompt(emotion, undefined, musicType, instrumental, lyricsLanguage);
+
+          sunoResponse = await axios.post(
+            `${SUNO_API_BASE}/api/v1/generate`,
+            {
+              prompt,
+              model: 'V4_5ALL',
+              instrumental: instrumental ?? false,
+              customMode: !instrumental,
+              callBackUrl,
+              count: 1,
+            },
+            {
+              headers: {
+                'Authorization': `Bearer ${SUNO_API_KEY.value().trim()}`,
+                'Content-Type': 'application/json',
+              },
+              timeout: 30000,
+            }
+          );
+        } else {
+          throw apiError;
         }
-      );
+      }
 
       const taskId = sunoResponse.data.data.taskId;
 

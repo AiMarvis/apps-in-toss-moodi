@@ -35,6 +35,19 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // 프로그레스 바 클릭/터치로 이동
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) => {
+    if (!audioRef.current || !duration) return;
+
+    const progressBar = e.currentTarget;
+    const rect = progressBar.getBoundingClientRect();
+    const clientX = 'touches' in e ? e.touches[0].clientX : e.clientX;
+    const clickX = clientX - rect.left;
+    const percentage = Math.max(0, Math.min(1, clickX / rect.width));
+
+    audioRef.current.currentTime = percentage * duration;
+  };
+
   // 재생/일시정지 토글
   const handlePlayPause = () => {
     if (audioRef.current) {
@@ -100,9 +113,19 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
         )}
       </div>
 
-      {/* Progress Display (No Seek) */}
+      {/* Progress Display with Seek */}
       <div className="progress-container">
-        <div className="progress-bar">
+        <div
+          className="progress-bar"
+          onClick={handleSeek}
+          onTouchStart={handleSeek}
+          role="slider"
+          aria-label="재생 위치"
+          aria-valuemin={0}
+          aria-valuemax={duration}
+          aria-valuenow={currentTime}
+          tabIndex={0}
+        >
           <div
             className="progress-fill"
             style={{ width: `${(currentTime / duration) * 100}%` }}

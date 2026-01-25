@@ -64,12 +64,13 @@ const INITIAL_CREDITS = 5;
 exports.generateMusic = functions
     .runWith({ secrets: [SUNO_API_KEY], timeoutSeconds: 300, memory: '512MB' })
     .https.onCall(async (data, context) => {
+    var _a, _b, _c, _d;
     // 인증 확인
     if (!context.auth) {
         throw new functions.https.HttpsError('unauthenticated', '로그인이 필요해요');
     }
     const userId = context.auth.uid;
-    const { emotion, text, instrumental, musicType } = data;
+    const { emotion, text, instrumental, musicType, lyricsLanguage } = data;
     // 감정 키워드 유효성 검사
     const validEmotions = ['sad', 'anxious', 'angry', 'depressed', 'tired', 'calm'];
     if (!validEmotions.includes(emotion)) {
@@ -88,23 +89,52 @@ exports.generateMusic = functions
     }
     try {
         // 음악 프롬프트 생성 (스타일 및 가사 힌트 반영)
-        const prompt = (0, generators_1.buildMusicPrompt)(emotion, text, musicType, instrumental);
+        let prompt = (0, generators_1.buildMusicPrompt)(emotion, text, musicType, instrumental, lyricsLanguage);
         // Suno API 호출 (콜백 URL 포함)
         const callBackUrl = 'https://us-central1-moodi-b8811.cloudfunctions.net/sunoCallback';
-        const sunoResponse = await axios_1.default.post(`${SUNO_API_BASE}/api/v1/generate`, {
-            prompt,
-            model: 'V4_5ALL',
-            instrumental: instrumental !== null && instrumental !== void 0 ? instrumental : false,
-            customMode: false,
-            callBackUrl,
-            count: 1,
-        }, {
-            headers: {
-                'Authorization': `Bearer ${SUNO_API_KEY.value().trim()}`,
-                'Content-Type': 'application/json',
-            },
-            timeout: 30000,
-        });
+        let sunoResponse;
+        try {
+            sunoResponse = await axios_1.default.post(`${SUNO_API_BASE}/api/v1/generate`, {
+                prompt,
+                model: 'V4_5ALL',
+                instrumental: instrumental !== null && instrumental !== void 0 ? instrumental : false,
+                customMode: !instrumental,
+                callBackUrl,
+                count: 1,
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${SUNO_API_KEY.value().trim()}`,
+                    'Content-Type': 'application/json',
+                },
+                timeout: 30000,
+            });
+        }
+        catch (apiError) {
+            // 아티스트 이름 오인식 에러 시 사용자 텍스트 제외하고 재시도
+            const axiosError = apiError;
+            if (((_a = axiosError.response) === null || _a === void 0 ? void 0 : _a.status) === 400 &&
+                ((_d = (_c = (_b = axiosError.response) === null || _b === void 0 ? void 0 : _b.data) === null || _c === void 0 ? void 0 : _c.msg) === null || _d === void 0 ? void 0 : _d.includes('artist name'))) {
+                console.log('[Fallback] 아티스트 이름 오인식으로 재시도 (텍스트 제외)');
+                prompt = (0, generators_1.buildMusicPrompt)(emotion, undefined, musicType, instrumental, lyricsLanguage);
+                sunoResponse = await axios_1.default.post(`${SUNO_API_BASE}/api/v1/generate`, {
+                    prompt,
+                    model: 'V4_5ALL',
+                    instrumental: instrumental !== null && instrumental !== void 0 ? instrumental : false,
+                    customMode: !instrumental,
+                    callBackUrl,
+                    count: 1,
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${SUNO_API_KEY.value().trim()}`,
+                        'Content-Type': 'application/json',
+                    },
+                    timeout: 30000,
+                });
+            }
+            else {
+                throw apiError;
+            }
+        }
         const taskId = sunoResponse.data.data.taskId;
         // Firestore에 pending 상태로 작업 저장
         await db.collection('pendingTasks').doc(taskId).set({

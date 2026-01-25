@@ -10,6 +10,7 @@ interface LocationState {
   emotionText?: string;
   instrumental?: boolean;
   musicType?: string;
+  lyricsLanguage?: 'ko' | 'en';
 }
 
 /**
@@ -34,7 +35,7 @@ export const LoadingPage: React.FC = () => {
     }
 
     // 음악 생성 시작 (musicType 포함)
-    generate(state.emotion, state.emotionText, state.instrumental, state.musicType);
+    generate(state.emotion, state.emotionText, state.instrumental, state.musicType, state.lyricsLanguage);
 
     // 클린업
     return () => {
@@ -56,7 +57,7 @@ export const LoadingPage: React.FC = () => {
   const handleRetry = () => {
     if (state?.emotion) {
       reset();
-      generate(state.emotion, state.emotionText, state.instrumental, state.musicType);
+      generate(state.emotion, state.emotionText, state.instrumental, state.musicType, state.lyricsLanguage);
     }
   };
 

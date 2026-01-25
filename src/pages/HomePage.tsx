@@ -32,6 +32,7 @@ export const HomePage: React.FC = () => {
   const [selectedMusicType, setSelectedMusicType] = useState<string | null>(null);
   const [emotionText, setEmotionText] = useState('');
   const [hasLyrics, setHasLyrics] = useState(true);
+  const [lyricsLanguage, setLyricsLanguage] = useState<'ko' | 'en'>('ko');
 
   const canGenerate = selectedEmotion !== null && credits > 0;
 
@@ -45,6 +46,7 @@ export const HomePage: React.FC = () => {
         musicType: selectedMusicType,
         emotionText: emotionText.trim() || undefined,
         instrumental: !hasLyrics,
+        lyricsLanguage: hasLyrics ? lyricsLanguage : undefined,
       },
     });
   };
@@ -129,6 +131,31 @@ export const HomePage: React.FC = () => {
             </button>
           </div>
         </section>
+
+        {/* Lyrics Language Selection (가사 포함 시에만 표시) */}
+        {hasLyrics && (
+          <section className="lyrics-language-section home-card">
+            <h3 className="section-label">
+              가사 언어를 선택해주세요
+            </h3>
+            <div className="lyrics-language-options">
+              <button
+                className={`language-option ${lyricsLanguage === 'ko' ? 'selected' : ''} ${credits <= 0 ? 'disabled' : ''}`}
+                onClick={() => setLyricsLanguage('ko')}
+                disabled={credits <= 0}
+              >
+                한국어
+              </button>
+              <button
+                className={`language-option ${lyricsLanguage === 'en' ? 'selected' : ''} ${credits <= 0 ? 'disabled' : ''}`}
+                onClick={() => setLyricsLanguage('en')}
+                disabled={credits <= 0}
+              >
+                English
+              </button>
+            </div>
+          </section>
+        )}
 
         {/* Text Input (Optional) */}
         <section className="text-section home-card">
