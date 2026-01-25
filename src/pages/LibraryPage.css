@@ -78,6 +78,14 @@
   animation: spin 2s linear infinite;
 }
 
+.loading-spinner-img {
+  width: 160px;
+  height: auto;
+  margin-bottom: var(--spacing-6);
+  animation: spin 3s linear infinite;
+  filter: drop-shadow(0 0 15px rgba(56, 189, 248, 0.5));
+}
+
 .error-icon,
 .empty-icon {
   font-size: 64px;

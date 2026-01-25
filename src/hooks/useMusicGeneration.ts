@@ -35,6 +35,7 @@ export function useMusicGeneration(): MusicGenerationState {
   
   const pollingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollingCountRef = useRef(0);
+  const isGeneratingRef = useRef(false);
 
   // 폴링 정리
   const clearPolling = useCallback(() => {
@@ -48,6 +49,7 @@ export function useMusicGeneration(): MusicGenerationState {
   // 상태 리셋
   const reset = useCallback(() => {
     clearPolling();
+    isGeneratingRef.current = false;
     setStatus('idle');
     setProgress(0);
     setTrack(null);
@@ -103,6 +105,13 @@ export function useMusicGeneration(): MusicGenerationState {
 
   const generate = useCallback(
     async (emotion: EmotionKeyword, text?: string, instrumental?: boolean, musicType?: string, lyricsLanguage?: 'ko' | 'en') => {
+      // 이중 호출 방지: 이미 생성 중이면 스킵
+      if (isGeneratingRef.current) {
+        console.log('[useMusicGeneration] 이미 생성 중, 스킵');
+        return;
+      }
+      isGeneratingRef.current = true;
+
       clearPolling();
       setStatus('generating');
       setProgress(10);
@@ -123,8 +132,9 @@ export function useMusicGeneration(): MusicGenerationState {
           checkStatus(taskId, emotion, text);
         }, POLLING_INTERVAL);
       } catch (err: unknown) {
+        isGeneratingRef.current = false;
         setStatus('error');
-        
+
         if (isCreditError(err)) {
           setError('크레딧이 부족해요. 내일 다시 시도해주세요!');
         } else if (isAuthError(err)) {

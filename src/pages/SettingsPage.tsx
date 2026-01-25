@@ -134,10 +134,10 @@ export const SettingsPage: React.FC = () => {
               <span className="menu-arrow">→</span>
             </a>
             <div className="menu-divider" />
-            <a 
-              className="menu-item" 
-              href="https://moodi.example.com/terms" 
-              target="_blank" 
+            <a
+              className="menu-item"
+              href="/terms.html"
+              target="_blank"
               rel="noopener noreferrer"
             >
               <div className="menu-icon">📄</div>

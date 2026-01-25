@@ -2,12 +2,12 @@ import type { EmotionInfo, EmotionKeyword } from '../types/emotion';
 
 // 6개 감정 키워드 정의 (PRD 5.1.2)
 export const EMOTIONS: EmotionInfo[] = [
-  { id: 'sad', label: '슬픔', emoji: '😢', color: '#4A90D9' },
-  { id: 'anxious', label: '불안', emoji: '😰', color: '#8B5CF6' },
-  { id: 'angry', label: '화남', emoji: '😤', color: '#EF4444' },
-  { id: 'depressed', label: '우울', emoji: '😔', color: '#6B7280' },
-  { id: 'tired', label: '피곤', emoji: '🥱', color: '#F59E0B' },
-  { id: 'calm', label: '차분', emoji: '😌', color: '#10B981' },
+  { id: 'sad', label: '슬픔', emoji: '😢', color: '#4A90D9', gradient: 'linear-gradient(135deg, #60A5FA 0%, #3B82F6 50%, #1E40AF 100%)' },
+  { id: 'anxious', label: '불안', emoji: '😰', color: '#8B5CF6', gradient: 'linear-gradient(135deg, #A78BFA 0%, #8B5CF6 50%, #6D28D9 100%)' },
+  { id: 'angry', label: '화남', emoji: '😤', color: '#EF4444', gradient: 'linear-gradient(135deg, #F87171 0%, #EF4444 50%, #B91C1C 100%)' },
+  { id: 'depressed', label: '우울', emoji: '😔', color: '#6B7280', gradient: 'linear-gradient(135deg, #9CA3AF 0%, #6B7280 50%, #374151 100%)' },
+  { id: 'tired', label: '피곤', emoji: '🥱', color: '#F59E0B', gradient: 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 50%, #D97706 100%)' },
+  { id: 'calm', label: '차분', emoji: '😌', color: '#10B981', gradient: 'linear-gradient(135deg, #34D399 0%, #10B981 50%, #059669 100%)' },
 ];
 
 // 감정 ID로 정보 찾기

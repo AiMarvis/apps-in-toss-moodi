@@ -14,6 +14,7 @@ export interface Track {
   duration: number;
   createdAt: Date;
   sunoTaskId: string;
+  pairId?: string; // Suno가 생성한 페어 트랙 ID (A/B 곡 연결용)
 }
 
 // User 타입
@@ -32,6 +33,7 @@ export interface EmotionInfo {
   label: string;
   emoji: string;
   color: string;
+  gradient: string;
 }
 
 

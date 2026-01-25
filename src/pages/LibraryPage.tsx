@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { TrackItem } from '../components/common/TrackItem';
 import { ConfirmModal } from '../components/common/ConfirmModal';
 import { useMyTracks } from '../hooks/useMyTracks';
+import MoodiLoading from '../assets/moodi-loading.png';
 import './LibraryPage.css';
 
 export const LibraryPage: React.FC = () => {
@@ -57,7 +58,7 @@ export const LibraryPage: React.FC = () => {
       <main className="library-content">
         {loading && tracks.length === 0 && (
           <div className="loading-state">
-            <span className="loading-spinner">🎵</span>
+            <img src={MoodiLoading} alt="로딩 중" className="loading-spinner-img" />
             <p>음악을 불러오고 있어요...</p>
           </div>
         )}

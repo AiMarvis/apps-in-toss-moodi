@@ -93,7 +93,6 @@ export const generateMusic = functions
             instrumental: instrumental ?? false,
             customMode: !instrumental,
             callBackUrl,
-            count: 1,
           },
           {
             headers: {
@@ -119,7 +118,6 @@ export const generateMusic = functions
               instrumental: instrumental ?? false,
               customMode: !instrumental,
               callBackUrl,
-              count: 1,
             },
             {
               headers: {
@@ -186,7 +184,24 @@ export const checkAndSaveMusic = functions
         if (pendingTask.status === 'completed' && pendingTask.trackId) {
           const trackDoc = await db.collection('tracks').doc(pendingTask.trackId).get();
           if (trackDoc.exists) {
-            return { status: 'complete', track: trackDoc.data() as Track };
+            const track = trackDoc.data() as Track;
+            // 페어 트랙이 있으면 함께 반환
+            let pairTrack: Track | null = null;
+            if (track.pairId) {
+              const pairSnapshot = await db.collection('tracks')
+                .where('pairId', '==', track.pairId)
+                .where('id', '!=', track.id)
+                .limit(1)
+                .get();
+              if (!pairSnapshot.empty) {
+                pairTrack = pairSnapshot.docs[0].data() as Track;
+              }
+            }
+            return {
+              status: 'complete',
+              track,
+              pairTrack, // 페어 트랙 (null이면 단일 곡)
+            };
           }
         }
 
@@ -213,58 +228,72 @@ export const checkAndSaveMusic = functions
 
       // 성공: status가 'SUCCESS'이고 response.data에 오디오 정보가 있을 때
       if (taskStatus === 'SUCCESS' && taskData?.response?.data?.[0]?.audio_url) {
-        const audioInfo = taskData.response.data[0];
+        const responseDataArray = taskData.response.data;
+        const pairId = db.collection('tracks').doc().id;
+        const savedTracks: Track[] = [];
 
-        // 음악 파일 다운로드
-        const audioResponse = await axios.get(audioInfo.audio_url, {
-          responseType: 'arraybuffer',
-          timeout: 60000,
-        });
+        // 모든 곡 저장 (Suno는 기본 2곡 생성)
+        for (let i = 0; i < responseDataArray.length; i++) {
+          const audioInfo = responseDataArray[i];
+          if (!audioInfo?.audio_url) continue;
 
-        // Firebase Storage에 업로드
-        const trackId = db.collection('tracks').doc().id;
-        const filePath = `tracks/${userId}/${trackId}.mp3`;
-        const bucket = storage.bucket();
-        const file = bucket.file(filePath);
+          // 음악 파일 다운로드
+          const audioResponse = await axios.get(audioInfo.audio_url, {
+            responseType: 'arraybuffer',
+            timeout: 60000,
+          });
 
-        await file.save(Buffer.from(audioResponse.data), {
-          metadata: {
-            contentType: 'audio/mpeg',
+          // Firebase Storage에 업로드
+          const trackId = db.collection('tracks').doc().id;
+          const filePath = `tracks/${userId}/${trackId}.mp3`;
+          const bucket = storage.bucket();
+          const file = bucket.file(filePath);
+
+          await file.save(Buffer.from(audioResponse.data), {
             metadata: {
-              emotion,
-              userId,
-              trackId,
+              contentType: 'audio/mpeg',
+              metadata: {
+                emotion,
+                userId,
+                trackId,
+              },
             },
-          },
-        });
+          });
 
-        // 파일 공개 설정
-        await file.makePublic();
-        const audioUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+          // 파일 공개 설정
+          await file.makePublic();
+          const audioUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
 
-        // Firestore에 메타데이터 저장
-        const trackData: Track = {
-          id: trackId,
-          userId,
-          emotion: emotion as EmotionKeyword,
-          emotionText,
-          title: generateTitle(emotion as EmotionKeyword),
-          description: generateDescription(emotion as EmotionKeyword),
-          audioUrl,
-          albumArt: getAlbumArt(emotion as EmotionKeyword),
-          duration: audioInfo.duration || 60,
-          createdAt: admin.firestore.Timestamp.now(),
-          sunoTaskId: taskId,
-        };
+          // Firestore에 메타데이터 저장
+          const trackData: Track = {
+            id: trackId,
+            userId,
+            emotion: emotion as EmotionKeyword,
+            emotionText,
+            title: generateTitle(emotion as EmotionKeyword),
+            description: generateDescription(emotion as EmotionKeyword),
+            audioUrl,
+            albumArt: getAlbumArt(emotion as EmotionKeyword),
+            duration: audioInfo.duration || 60,
+            createdAt: admin.firestore.Timestamp.now(),
+            sunoTaskId: taskId,
+            pairId, // 같은 요청에서 생성된 곡들은 동일한 pairId
+          };
 
-        await db.collection('tracks').doc(trackId).set(trackData);
+          await db.collection('tracks').doc(trackId).set(trackData);
+          savedTracks.push(trackData);
+        }
 
-        // 사용자 통계 업데이트
+        // 사용자 통계 업데이트 (저장된 곡 수만큼)
         await db.collection('users').doc(userId).update({
-          trackCount: admin.firestore.FieldValue.increment(1),
+          trackCount: admin.firestore.FieldValue.increment(savedTracks.length),
         });
 
-        return { status: 'complete', track: trackData };
+        return {
+          status: 'complete',
+          track: savedTracks[0],
+          pairTrack: savedTracks[1] || null,
+        };
       }
 
       // 실패 상태 처리
@@ -673,70 +702,83 @@ export const sunoCallback = functions
       const emotion = pendingTask.emotion;
       const emotionText = pendingTask.emotionText;
 
-      // "complete" 콜백이고 오디오 URL이 있을 때만 저장
-      if (callbackType === 'complete' && responseData?.[0]?.audio_url) {
-        const audioInfo = responseData[0];
+      // "complete" 콜백이고 오디오 URL이 있을 때 - 모든 곡 저장 (2곡 제공)
+      if (callbackType === 'complete' && responseData?.length > 0 && responseData[0]?.audio_url) {
+        // 페어 ID 생성 (동일 요청에서 생성된 곡들을 연결)
+        const pairId = db.collection('tracks').doc().id;
+        const savedTrackIds: string[] = [];
 
-        console.log(`[Suno Callback] 음악 다운로드 시작: ${audioInfo.audio_url}`);
+        // 모든 곡 저장 (Suno는 기본 2곡 생성)
+        for (let i = 0; i < responseData.length; i++) {
+          const audioInfo = responseData[i];
+          if (!audioInfo?.audio_url) continue;
 
-        // 음악 파일 다운로드
-        const audioResponse = await axios.get(audioInfo.audio_url, {
-          responseType: 'arraybuffer',
-          timeout: 60000,
-        });
+          console.log(`[Suno Callback] 음악 다운로드 시작 (${i + 1}/${responseData.length}): ${audioInfo.audio_url}`);
 
-        // Firebase Storage에 업로드
-        const trackId = db.collection('tracks').doc().id;
-        const filePath = `tracks/${userId}/${trackId}.mp3`;
-        const bucket = storage.bucket();
-        const file = bucket.file(filePath);
+          // 음악 파일 다운로드
+          const audioResponse = await axios.get(audioInfo.audio_url, {
+            responseType: 'arraybuffer',
+            timeout: 60000,
+          });
 
-        await file.save(Buffer.from(audioResponse.data), {
-          metadata: {
-            contentType: 'audio/mpeg',
+          // Firebase Storage에 업로드
+          const trackId = db.collection('tracks').doc().id;
+          const filePath = `tracks/${userId}/${trackId}.mp3`;
+          const bucket = storage.bucket();
+          const file = bucket.file(filePath);
+
+          await file.save(Buffer.from(audioResponse.data), {
             metadata: {
-              emotion,
-              userId,
-              trackId,
+              contentType: 'audio/mpeg',
+              metadata: {
+                emotion,
+                userId,
+                trackId,
+              },
             },
-          },
-        });
+          });
 
-        // 파일 공개 설정
-        await file.makePublic();
-        const audioUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
+          // 파일 공개 설정
+          await file.makePublic();
+          const audioUrl = `https://storage.googleapis.com/${bucket.name}/${filePath}`;
 
-        // Firestore에 메타데이터 저장
-        const trackData: Track = {
-          id: trackId,
-          userId,
-          emotion: emotion as EmotionKeyword,
-          emotionText,
-          title: generateTitle(emotion as EmotionKeyword),
-          description: generateDescription(emotion as EmotionKeyword),
-          audioUrl,
-          albumArt: getAlbumArt(emotion as EmotionKeyword),
-          duration: audioInfo.duration || 60,
-          createdAt: admin.firestore.Timestamp.now(),
-          sunoTaskId: taskId,
-        };
+          // Firestore에 메타데이터 저장
+          const trackData: Track = {
+            id: trackId,
+            userId,
+            emotion: emotion as EmotionKeyword,
+            emotionText,
+            title: generateTitle(emotion as EmotionKeyword),
+            description: generateDescription(emotion as EmotionKeyword),
+            audioUrl,
+            albumArt: getAlbumArt(emotion as EmotionKeyword),
+            duration: audioInfo.duration || 60,
+            createdAt: admin.firestore.Timestamp.now(),
+            sunoTaskId: taskId,
+            pairId, // 같은 요청에서 생성된 곡들은 동일한 pairId
+          };
 
-        await db.collection('tracks').doc(trackId).set(trackData);
+          await db.collection('tracks').doc(trackId).set(trackData);
+          savedTrackIds.push(trackId);
 
-        // 사용자 통계 업데이트
+          console.log(`[Suno Callback] 트랙 저장 완료 (${i + 1}/${responseData.length}): ${trackId}`);
+        }
+
+        // 사용자 통계 업데이트 (저장된 곡 수만큼)
         await db.collection('users').doc(userId).update({
-          trackCount: admin.firestore.FieldValue.increment(1),
+          trackCount: admin.firestore.FieldValue.increment(savedTrackIds.length),
         });
 
-        // pendingTask 완료 상태로 업데이트
+        // pendingTask 완료 상태로 업데이트 (첫 번째 trackId 저장 - 폴링 호환성)
         await pendingTaskRef.update({
           status: 'completed',
-          trackId,
+          trackId: savedTrackIds[0],
+          trackIds: savedTrackIds, // 모든 트랙 ID 저장
           updatedAt: admin.firestore.Timestamp.now(),
         });
 
-        console.log(`[Suno Callback] 작업 완료: ${taskId}, trackId: ${trackId}`);
-        res.status(200).json({ success: true, status: 'completed', trackId });
+        console.log(`[Suno Callback] 작업 완료: ${taskId}, 저장된 트랙: ${savedTrackIds.length}개`);
+        res.status(200).json({ success: true, status: 'completed', trackIds: savedTrackIds });
         return;
       }
 

@@ -1,4 +1,5 @@
 import React from 'react';
+import MoodiLoading from '../../assets/moodi-loading.png';
 import './LoadingAnimation.css';
 
 interface LoadingAnimationProps {
@@ -70,7 +71,11 @@ export const LoadingAnimation: React.FC<LoadingAnimationProps> = ({
           
           {/* 중앙 아이콘 */}
           <div className="loading-icon">
-            <span className="music-note">🎵</span>
+            <img
+              src={MoodiLoading}
+              alt="Moodi"
+              className="loading-character"
+            />
           </div>
         </div>
         

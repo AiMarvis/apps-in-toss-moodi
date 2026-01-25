@@ -25,6 +25,7 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [imgError, setImgError] = useState(false);
 
   const emotion = getEmotionById(track.emotion);
 
@@ -93,11 +94,25 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
       />
 
       {/* Album Art */}
-      <div 
+      <div
         className="album-art-container"
         style={{ '--emotion-color': emotion?.color } as React.CSSProperties}
       >
-        <img src={track.albumArt} alt="앨범 아트" className="album-art" />
+        {imgError || !track.albumArt ? (
+          <div
+            className="album-art-fallback"
+            style={{ background: emotion?.gradient }}
+          >
+            <span className="fallback-emoji-large">{emotion?.emoji}</span>
+          </div>
+        ) : (
+          <img
+            src={track.albumArt}
+            alt="앨범 아트"
+            className="album-art"
+            onError={() => setImgError(true)}
+          />
+        )}
         <div className="album-art-glow"></div>
       </div>
 

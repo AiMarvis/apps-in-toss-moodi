@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { LoadingAnimation } from '../components/common/LoadingAnimation';
 import { useMusicGeneration } from '../hooks/useMusicGeneration';
@@ -23,8 +23,11 @@ export const LoadingPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as LocationState | null;
-  
+
   const { status, progress, track, error, generate, reset } = useMusicGeneration();
+
+  // 이중 호출 방지용 ref
+  const hasStartedRef = useRef(false);
 
   // 페이지 진입 시 음악 생성 시작
   useEffect(() => {
@@ -33,6 +36,12 @@ export const LoadingPage: React.FC = () => {
       navigate('/', { replace: true });
       return;
     }
+
+    // 이중 호출 방지: 이미 시작했으면 스킵
+    if (hasStartedRef.current) {
+      return;
+    }
+    hasStartedRef.current = true;
 
     // 음악 생성 시작 (musicType 포함)
     generate(state.emotion, state.emotionText, state.instrumental, state.musicType, state.lyricsLanguage);

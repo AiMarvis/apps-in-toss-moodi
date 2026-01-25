@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Track } from '../../types/emotion';
 import { getEmotionById } from '../../constants/emotions';
 import './TrackItem.css';
@@ -23,6 +23,7 @@ export const TrackItem: React.FC<TrackItemProps> = ({
   onDelete,
   showDelete = false,
 }) => {
+  const [imgError, setImgError] = useState(false);
   const emotion = getEmotionById(track.emotion);
 
   // 생성 시간 포맷팅
@@ -51,10 +52,23 @@ export const TrackItem: React.FC<TrackItemProps> = ({
     <div className="track-item" onClick={onClick} role="button" tabIndex={0}>
       {/* 썸네일 */}
       <div className="track-thumbnail">
-        <img src={track.albumArt} alt="" />
+        {imgError || !track.albumArt ? (
+          <div
+            className="album-fallback"
+            style={{ background: emotion?.gradient }}
+          >
+            <span className="fallback-emoji">{emotion?.emoji}</span>
+          </div>
+        ) : (
+          <img
+            src={track.albumArt}
+            alt=""
+            onError={() => setImgError(true)}
+          />
+        )}
         {emotion && (
-          <div 
-            className="track-emotion-badge" 
+          <div
+            className="track-emotion-badge"
             style={{ backgroundColor: emotion.color }}
           >
             {emotion.emoji}

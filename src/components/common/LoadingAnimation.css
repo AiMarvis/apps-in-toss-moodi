@@ -48,6 +48,23 @@
   animation: breathing 2s ease-in-out infinite;
 }
 
+/* Loading Character */
+.loading-character {
+  width: 80px;
+  height: auto;
+  filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.5));
+  animation: spinCharacter 3s linear infinite;
+}
+
+@keyframes spinCharacter {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 /* Pulse Rings */
 .pulse-ring {
   position: absolute;

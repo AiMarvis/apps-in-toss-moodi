@@ -16,6 +16,7 @@ export interface Track {
   duration: number;
   createdAt: Timestamp;
   sunoTaskId: string;
+  pairId?: string; // Suno가 생성한 페어 트랙 ID (A/B 곡 연결용)
 }
 
 // Firestore User 문서
