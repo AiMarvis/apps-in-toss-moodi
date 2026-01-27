@@ -26,41 +26,58 @@ export const LoadingPage: React.FC = () => {
 
   const { status, progress, track, error, generate, reset } = useMusicGeneration();
 
-  // 이중 호출 방지용 ref
   const hasStartedRef = useRef(false);
+  const hasNavigatedRef = useRef(false);
 
-  // 페이지 진입 시 음악 생성 시작
   useEffect(() => {
     if (!state?.emotion) {
-      // 감정 정보 없으면 홈으로
       navigate('/', { replace: true });
       return;
     }
 
-    // 이중 호출 방지: 이미 시작했으면 스킵
     if (hasStartedRef.current) {
       return;
     }
     hasStartedRef.current = true;
 
-    // 음악 생성 시작 (musicType 포함)
     generate(state.emotion, state.emotionText, state.instrumental, state.musicType, state.lyricsLanguage);
 
-    // 클린업
     return () => {
-      reset();
+      if (!hasNavigatedRef.current) {
+        reset();
+      }
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 완료 시 플레이어로 이동
   useEffect(() => {
+    console.log('[LoadingPage] Status changed:', { 
+      status, 
+      hasTrack: !!track,
+      trackId: track?.id,
+      trackTitle: track?.title,
+      audioUrl: track?.audioUrl,
+    });
+    
     if (status === 'complete' && track) {
+      console.log('[LoadingPage] Navigating to /player with track:', {
+        id: track.id,
+        title: track.title,
+        audioUrl: track.audioUrl,
+        emotion: state?.emotion,
+      });
+      
+      hasNavigatedRef.current = true;
+      
       navigate('/player', {
-        state: { track },
+        state: {
+          track,
+          emotion: state?.emotion,
+          emotionText: state?.emotionText,
+        },
         replace: true,
       });
     }
-  }, [status, track, navigate]);
+  }, [status, track, navigate, state?.emotion, state?.emotionText]);
 
   // 에러 발생 시
   const handleRetry = () => {

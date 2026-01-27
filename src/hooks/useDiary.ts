@@ -117,7 +117,14 @@ export function useDiary(): UseDiaryReturn {
 
   const addDiary = useCallback(async (request: CreateDiaryRequest): Promise<DiaryEntry | null> => {
     const user = auth.currentUser;
+    console.log('[useDiary] addDiary called:', { 
+      request, 
+      userId: user?.uid,
+      isAuthenticated: !!user 
+    });
+    
     if (!user) {
+      console.error('[useDiary] No authenticated user');
       setError('로그인이 필요합니다.');
       return null;
     }
@@ -134,8 +141,10 @@ export function useDiary(): UseDiaryReturn {
         updatedAt: now,
       };
 
+      console.log('[useDiary] Writing to Firestore:', diaryData);
       const diariesRef = collection(db, 'diaries');
       const docRef = await addDoc(diariesRef, diaryData);
+      console.log('[useDiary] Diary created with ID:', docRef.id);
 
       const newDiary: DiaryEntry = {
         id: docRef.id,
@@ -146,7 +155,8 @@ export function useDiary(): UseDiaryReturn {
 
       setDiaries(prev => [newDiary, ...prev]);
       return newDiary;
-    } catch {
+    } catch (err) {
+      console.error('[useDiary] Failed to save diary:', err);
       setError('다이어리 저장에 실패했어요.');
       return null;
     }

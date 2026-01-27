@@ -1,0 +1,49 @@
+.emotion-category-tabs {
+  display: flex;
+  gap: var(--spacing-2);
+  padding: var(--spacing-2);
+  background: var(--color-background);
+  border-radius: var(--radius-full);
+}
+
+.category-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-1);
+  padding: var(--spacing-3) var(--spacing-4);
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-sub);
+  font-family: var(--font-family);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.category-tab:hover:not(.disabled) {
+  background: var(--color-surface);
+}
+
+.category-tab.selected {
+  background: var(--color-surface);
+  color: var(--color-text-main);
+  font-weight: var(--font-weight-semibold);
+  box-shadow: var(--shadow-soft);
+}
+
+.category-tab.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.category-emoji {
+  font-size: 16px;
+}
+
+.category-label {
+  white-space: nowrap;
+}

@@ -89,7 +89,7 @@ export function useMyTracks(): MyTracksState {
       setTracks((prev) => prev.filter((t) => t.id !== trackId));
       
       return true;
-    } catch (err) {
+    } catch {
       setError('삭제에 실패했어요.');
       return false;
     }

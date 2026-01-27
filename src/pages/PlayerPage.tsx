@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { MusicPlayer } from '../components/player/MusicPlayer';
-import type { Track } from '../types/emotion';
+import { useDiary } from '../hooks/useDiary';
+import type { Track, EmotionKeyword } from '../types/emotion';
 import './PlayerPage.css';
 
 interface LocationState {
   track: Track;
+  emotion?: EmotionKeyword;
+  emotionText?: string;
 }
 
 /**
@@ -18,14 +21,61 @@ export const PlayerPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as LocationState | null;
+  const { addDiary } = useDiary();
+  const diarySavedRef = useRef(false);
+
+  // 디버깅: location.state 확인
+  console.log('[PlayerPage] Mounted with location.state:', {
+    hasState: !!state,
+    hasTrack: !!state?.track,
+    trackId: state?.track?.id,
+    trackTitle: state?.track?.title,
+    audioUrl: state?.track?.audioUrl,
+    emotion: state?.emotion,
+  });
+
+  const track = state?.track;
+  const emotion = state?.emotion;
+  const emotionText = state?.emotionText;
+
+  useEffect(() => {
+    if (!track) return;
+    if (diarySavedRef.current) return;
+    if (!emotion) return;
+
+    const saveDiary = async () => {
+      const now = new Date();
+      const kstDate = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+      const today = kstDate.toISOString().split('T')[0];
+      console.log('[PlayerPage] Saving diary for trackId:', track.id);
+      
+      try {
+        const result = await addDiary({
+          date: today,
+          emotion,
+          content: emotionText || track.description,
+          trackId: track.id,
+        });
+        
+        if (result) {
+          diarySavedRef.current = true;
+          console.log('[PlayerPage] Diary saved successfully:', result.id);
+        } else {
+          console.error('[PlayerPage] addDiary returned null');
+        }
+      } catch (err) {
+        console.error('[PlayerPage] Failed to save diary:', err);
+      }
+    };
+
+    saveDiary();
+  }, [track, emotion, emotionText, addDiary]);
 
   // 트랙 정보 없으면 홈으로
-  if (!state?.track) {
+  if (!track) {
     navigate('/', { replace: true });
     return null;
   }
-
-  const { track } = state;
 
   const handleRegenerate = () => {
     navigate('/', { replace: true });

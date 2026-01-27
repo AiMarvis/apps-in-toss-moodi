@@ -1,7 +1,11 @@
 import { Timestamp } from 'firebase-admin/firestore';
 
-// 감정 키워드 타입
-export type EmotionKeyword = 'sad' | 'anxious' | 'angry' | 'depressed' | 'tired' | 'calm';
+// 감정 키워드 타입 (18개: 기존 6개 + 신규 12개)
+export type EmotionKeyword =
+  | 'sad' | 'anxious' | 'angry' | 'depressed' | 'tired' | 'calm'
+  | 'happy' | 'excited' | 'grateful'
+  | 'nostalgic' | 'bittersweet' | 'cozy' | 'hopeful' | 'empty'
+  | 'lonely' | 'stressed' | 'frustrated' | 'disappointed';
 
 // Firestore Track 문서
 export interface Track {

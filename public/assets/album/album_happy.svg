@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" fill="none">
+  <defs>
+    <linearGradient id="happy-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE68A"/>
+      <stop offset="100%" stop-color="#FBBF24"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="400" fill="url(#happy-bg)"/>
+  <circle cx="200" cy="150" r="80" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="200" cy="200" r="120" fill="rgba(255,255,255,0.05)"/>
+  <text x="200" y="220" font-size="120" text-anchor="middle" fill="white">😊</text>
+  <text x="200" y="340" font-size="32" font-family="sans-serif" font-weight="bold" text-anchor="middle" fill="rgba(255,255,255,0.9)">행복</text>
+</svg>

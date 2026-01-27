@@ -89,8 +89,21 @@ export const MusicPlayer: React.FC<MusicPlayerProps> = ({
         ref={audioRef}
         src={track.audioUrl}
         onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime || 0)}
-        onLoadedMetadata={() => setDuration(audioRef.current?.duration || track.duration)}
+        onLoadedMetadata={() => {
+          console.log('[MusicPlayer] Audio loaded, duration:', audioRef.current?.duration);
+          setDuration(audioRef.current?.duration || track.duration);
+        }}
         onEnded={() => setIsPlaying(false)}
+        onError={(e) => {
+          const audio = e.currentTarget;
+          console.error('[MusicPlayer] Audio error:', {
+            audioUrl: track.audioUrl,
+            error: audio.error?.message,
+            code: audio.error?.code,
+            networkState: audio.networkState,
+            readyState: audio.readyState,
+          });
+        }}
       />
 
       {/* Album Art */}

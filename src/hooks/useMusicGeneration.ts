@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { generateMusic, checkAndSaveMusic } from '../api/musicApi';
 import { ensureAuth } from '../lib/ensureAuth';
 import { getErrorMessage, isCreditError, isAuthError } from '../utils/errorHandler';
@@ -16,17 +16,9 @@ interface MusicGenerationState {
   reset: () => void;
 }
 
-// 폴링 간격 (ms)
 const POLLING_INTERVAL = 3000;
-// 최대 폴링 횟수 (300초 = 5분 타임아웃)
 const MAX_POLLING_COUNT = 100;
 
-/**
- * 음악 생성 Hook
- * - Suno API 호출
- * - 상태 폴링
- * - 완료 시 Firebase Storage 저장
- */
 export function useMusicGeneration(): MusicGenerationState {
   const [status, setStatus] = useState<GenerationStatus>('idle');
   const [progress, setProgress] = useState(0);
@@ -36,8 +28,8 @@ export function useMusicGeneration(): MusicGenerationState {
   const pollingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pollingCountRef = useRef(0);
   const isGeneratingRef = useRef(false);
+  const checkStatusRef = useRef<((taskId: string, emotion: EmotionKeyword, emotionText?: string) => Promise<void>) | null>(null);
 
-  // 폴링 정리
   const clearPolling = useCallback(() => {
     if (pollingRef.current) {
       clearTimeout(pollingRef.current);
@@ -46,7 +38,6 @@ export function useMusicGeneration(): MusicGenerationState {
     pollingCountRef.current = 0;
   }, []);
 
-  // 상태 리셋
   const reset = useCallback(() => {
     clearPolling();
     isGeneratingRef.current = false;
@@ -59,28 +50,33 @@ export function useMusicGeneration(): MusicGenerationState {
   const checkStatus = useCallback(
     async (taskId: string, emotion: EmotionKeyword, emotionText?: string) => {
       try {
+        console.log('[useMusicGeneration] Checking status for taskId:', taskId);
         const data = await checkAndSaveMusic({
           taskId,
           emotion,
           emotionText,
         });
+        
+        console.log('[useMusicGeneration] checkAndSaveMusic response:', {
+          status: data.status,
+          hasTrack: !!data.track,
+          trackId: data.track?.id,
+          audioUrl: data.track?.audioUrl,
+          progress: data.progress,
+        });
 
         if (data.status === 'complete' && data.track) {
-          // 완료
           setStatus('complete');
           setProgress(100);
           setTrack(data.track);
           clearPolling();
         } else if (data.status === 'failed') {
-          // 실패
           setStatus('error');
           setError('음악 생성에 실패했어요. 다시 시도해주세요.');
           clearPolling();
         } else {
-          // 진행 중
           setProgress(data.progress || 50);
           
-          // 폴링 횟수 체크
           pollingCountRef.current += 1;
           if (pollingCountRef.current >= MAX_POLLING_COUNT) {
             setStatus('error');
@@ -89,12 +85,12 @@ export function useMusicGeneration(): MusicGenerationState {
             return;
           }
 
-          // 다음 폴링 예약
           pollingRef.current = setTimeout(() => {
-            checkStatus(taskId, emotion, emotionText);
+            checkStatusRef.current?.(taskId, emotion, emotionText);
           }, POLLING_INTERVAL);
         }
       } catch (err) {
+        console.error('[useMusicGeneration] checkAndSaveMusic error:', err);
         setStatus('error');
         setError(getErrorMessage(err));
         clearPolling();
@@ -103,9 +99,12 @@ export function useMusicGeneration(): MusicGenerationState {
     [clearPolling]
   );
 
+  useEffect(() => {
+    checkStatusRef.current = checkStatus;
+  }, [checkStatus]);
+
   const generate = useCallback(
     async (emotion: EmotionKeyword, text?: string, instrumental?: boolean, musicType?: string, lyricsLanguage?: 'ko' | 'en') => {
-      // 이중 호출 방지: 이미 생성 중이면 스킵
       if (isGeneratingRef.current) {
         console.log('[useMusicGeneration] 이미 생성 중, 스킵');
         return;
@@ -129,7 +128,7 @@ export function useMusicGeneration(): MusicGenerationState {
         setProgress(20);
 
         pollingRef.current = setTimeout(() => {
-          checkStatus(taskId, emotion, text);
+          checkStatusRef.current?.(taskId, emotion, text);
         }, POLLING_INTERVAL);
       } catch (err: unknown) {
         isGeneratingRef.current = false;
@@ -144,7 +143,7 @@ export function useMusicGeneration(): MusicGenerationState {
         }
       }
     },
-    [clearPolling, checkStatus]
+    [clearPolling]
   );
 
   return { status, progress, track, error, generate, reset };

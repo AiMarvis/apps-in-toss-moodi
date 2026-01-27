@@ -23,9 +23,11 @@ export const CalendarPage: React.FC = () => {
   }, [currentDate, fetchDiariesByMonth]);
 
   const diaryDates = useMemo(() => {
-    const map = new Map<string, string>();
+    const map = new Map<string, string[]>();
     diaries.forEach(diary => {
-      map.set(diary.date, diary.emotion);
+      const existing = map.get(diary.date) || [];
+      existing.push(diary.emotion);
+      map.set(diary.date, existing);
     });
     return map;
   }, [diaries]);
@@ -51,7 +53,7 @@ export const CalendarPage: React.FC = () => {
 
   const handleNewDiary = () => {
     const dateString = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : format(new Date(), 'yyyy-MM-dd');
-    navigate('/', { state: { diaryDate: dateString } });
+    navigate('/diary/write', { state: { date: dateString } });
   };
 
   const getEmotionInfo = (emotionId: string) => {

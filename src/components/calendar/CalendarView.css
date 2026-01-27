@@ -115,11 +115,11 @@
 }
 
 .day-selected {
-  background-color: var(--color-text-main) !important;
+  background-color: var(--color-primary) !important;
   color: var(--color-surface) !important;
 }
 
-.day-selected .day-today {
+.day-selected .day-number {
   color: var(--color-surface);
 }
 
@@ -129,21 +129,32 @@
 }
 
 /* Emotion Indicators */
+.emotion-dots {
+  display: flex;
+  gap: 2px;
+  position: absolute;
+  bottom: 2px;
+  justify-content: center;
+  align-items: center;
+}
+
 .emotion-dot {
   width: 4px;
   height: 4px;
   border-radius: 50%;
-  position: absolute;
-  bottom: 4px;
-  /* Default color if not set */
   background-color: var(--color-text-hint);
+}
+
+.emotion-more {
+  font-size: 8px;
+  color: var(--color-text-sub);
+  margin-left: 1px;
 }
 
 .day-selected .emotion-dot {
   background-color: var(--color-surface);
 }
 
-/* Specific Emotion Colors - applied via inline style or classes */
-/* But strictly we should use the variables.
-   React will inject these as style={{ backgroundColor: 'var(--color-emotion-sad)' }}
-*/
+.day-selected .emotion-more {
+  color: var(--color-surface);
+}

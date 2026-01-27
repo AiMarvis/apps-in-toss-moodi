@@ -56,7 +56,12 @@ export const generateMusic = functions
     const { emotion, text, instrumental, musicType, lyricsLanguage } = data;
 
     // 감정 키워드 유효성 검사
-    const validEmotions: EmotionKeyword[] = ['sad', 'anxious', 'angry', 'depressed', 'tired', 'calm'];
+    const validEmotions: EmotionKeyword[] = [
+      'sad', 'anxious', 'angry', 'depressed', 'tired', 'calm',
+      'happy', 'excited', 'grateful',
+      'nostalgic', 'bittersweet', 'cozy', 'hopeful', 'empty',
+      'lonely', 'stressed', 'frustrated', 'disappointed',
+    ];
     if (!validEmotions.includes(emotion)) {
       throw new functions.https.HttpsError('invalid-argument', '올바른 감정을 선택해주세요');
     }
@@ -176,15 +181,20 @@ export const checkAndSaveMusic = functions
     try {
       // 1. pendingTasks에서 콜백 처리 완료 여부 확인
       const pendingTaskDoc = await db.collection('pendingTasks').doc(taskId).get();
+      console.log(`[checkAndSaveMusic] taskId: ${taskId}, pendingTask exists: ${pendingTaskDoc.exists}`);
 
       if (pendingTaskDoc.exists) {
         const pendingTask = pendingTaskDoc.data()!;
+        console.log(`[checkAndSaveMusic] pendingTask status: ${pendingTask.status}, trackId: ${pendingTask.trackId}`);
 
         // 콜백으로 이미 완료된 경우 - tracks에서 조회하여 반환
         if (pendingTask.status === 'completed' && pendingTask.trackId) {
+          console.log(`[checkAndSaveMusic] Callback completed, fetching track: ${pendingTask.trackId}`);
           const trackDoc = await db.collection('tracks').doc(pendingTask.trackId).get();
+          console.log(`[checkAndSaveMusic] Track exists: ${trackDoc.exists}`);
           if (trackDoc.exists) {
             const track = trackDoc.data() as Track;
+            console.log(`[checkAndSaveMusic] Returning track: ${track.id}, audioUrl: ${track.audioUrl}`);
             // 페어 트랙이 있으면 함께 반환
             let pairTrack: Track | null = null;
             if (track.pairId) {
@@ -207,11 +217,17 @@ export const checkAndSaveMusic = functions
 
         // 콜백에서 실패 처리된 경우
         if (pendingTask.status === 'failed') {
+          console.log(`[checkAndSaveMusic] Task failed: ${pendingTask.errorMessage}`);
           throw new functions.https.HttpsError('internal', pendingTask.errorMessage || '음악 생성에 실패했어요.');
         }
+        
+        console.log(`[checkAndSaveMusic] Callback not completed yet, status: ${pendingTask.status}`);
+      } else {
+        console.log(`[checkAndSaveMusic] pendingTask not found: ${taskId}`);
       }
 
       // 2. 아직 콜백이 처리되지 않은 경우 - Suno API 직접 조회 (fallback)
+      console.log(`[checkAndSaveMusic] Falling back to Suno API polling for taskId: ${taskId}`);
       const statusResponse = await axios.get(
         `${SUNO_API_BASE}/api/v1/generate/record-info?taskId=${taskId}`,
         {
@@ -308,7 +324,35 @@ export const checkAndSaveMusic = functions
         progress: taskStatus === 'GENERATING' ? 50 : 30,
       };
     } catch (error) {
-      console.error('상태 확인 실패:', error);
+      // Suno API 폴링 실패 (타임아웃 등) - 콜백이 아직 처리 중일 수 있음
+      console.error('[checkAndSaveMusic] Suno API 폴링 실패:', error);
+      
+      // pendingTask가 아직 존재하고 failed가 아니면 계속 기다리도록 processing 반환
+      const pendingTaskDoc = await db.collection('pendingTasks').doc(taskId).get();
+      if (pendingTaskDoc.exists) {
+        const pendingTask = pendingTaskDoc.data()!;
+        
+        // 콜백이 완료된 경우 - 트랙 반환
+        if (pendingTask.status === 'completed' && pendingTask.trackId) {
+          console.log(`[checkAndSaveMusic] 폴링 실패했지만 콜백 완료됨, trackId: ${pendingTask.trackId}`);
+          const trackDoc = await db.collection('tracks').doc(pendingTask.trackId).get();
+          if (trackDoc.exists) {
+            const track = trackDoc.data() as Track;
+            return { status: 'complete', track };
+          }
+        }
+        
+        // 실패 상태가 아니면 계속 기다리라고 processing 반환
+        if (pendingTask.status !== 'failed') {
+          console.log(`[checkAndSaveMusic] 폴링 실패했지만 pendingTask 상태: ${pendingTask.status}, 계속 대기`);
+          return {
+            status: 'processing',
+            progress: 40,
+          };
+        }
+      }
+      
+      // 정말 실패한 경우에만 에러 던지기
       throw new functions.https.HttpsError('internal', '상태 확인에 실패했어요. 다시 시도해주세요.');
     }
   });
@@ -773,9 +817,28 @@ export const sunoCallback = functions
         await pendingTaskRef.update({
           status: 'completed',
           trackId: savedTrackIds[0],
-          trackIds: savedTrackIds, // 모든 트랙 ID 저장
+          trackIds: savedTrackIds,
           updatedAt: admin.firestore.Timestamp.now(),
         });
+
+        // 첫 번째 트랙에 대해 diary 자동 저장 (프론트엔드 에러 시에도 기록 보존)
+        const now = new Date();
+        const kstDate = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+        const today = kstDate.toISOString().split('T')[0];
+        const firstTrackDoc = await db.collection('tracks').doc(savedTrackIds[0]).get();
+        if (firstTrackDoc.exists) {
+          const firstTrack = firstTrackDoc.data()!;
+          await db.collection('diaries').add({
+            userId,
+            date: today,
+            emotion: emotion,
+            content: emotionText || firstTrack.description || '',
+            trackId: savedTrackIds[0],
+            createdAt: admin.firestore.Timestamp.now(),
+            updatedAt: admin.firestore.Timestamp.now(),
+          });
+          console.log(`[Suno Callback] 일기 자동 저장 완료: ${today}, emotion: ${emotion}`);
+        }
 
         console.log(`[Suno Callback] 작업 완료: ${taskId}, 저장된 트랙: ${savedTrackIds.length}개`);
         res.status(200).json({ success: true, status: 'completed', trackIds: savedTrackIds });

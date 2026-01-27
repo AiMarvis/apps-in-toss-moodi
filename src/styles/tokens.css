@@ -32,6 +32,18 @@
   --color-emotion-depressed: #6b7280;
   --color-emotion-tired: #f59e0b;
   --color-emotion-calm: #10b981;
+  --color-emotion-happy: #fbbf24;
+  --color-emotion-excited: #f472b6;
+  --color-emotion-grateful: #34d399;
+  --color-emotion-nostalgic: #818cf8;
+  --color-emotion-bittersweet: #a78bfa;
+  --color-emotion-cozy: #fb923c;
+  --color-emotion-hopeful: #facc15;
+  --color-emotion-empty: #94a3b8;
+  --color-emotion-lonely: #64748b;
+  --color-emotion-stressed: #f87171;
+  --color-emotion-frustrated: #fb7185;
+  --color-emotion-disappointed: #a1a1aa;
 
   /* === Typography === */
   --font-family: 'Toss Product Sans', 'Pretendard', -apple-system,

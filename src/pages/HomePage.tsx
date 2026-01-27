@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { EmotionChip } from '../components/common/EmotionChip';
+import { EmotionCategoryTabs } from '../components/common/EmotionCategoryTabs';
 import { CreditIndicator } from '../components/credit/CreditIndicator';
 import { EMOTIONS } from '../constants/emotions';
-import type { EmotionKeyword } from '../types/emotion';
+import type { EmotionKeyword, EmotionCategory } from '../types/emotion';
 import { useCredits } from '../hooks/useCredits';
 import './HomePage.css';
 
@@ -29,10 +30,15 @@ export const HomePage: React.FC = () => {
   const { credits } = useCredits();
   
   const [selectedEmotion, setSelectedEmotion] = useState<EmotionKeyword | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<EmotionCategory>('negative');
   const [selectedMusicType, setSelectedMusicType] = useState<string | null>(null);
   const [emotionText, setEmotionText] = useState('');
   const [hasLyrics, setHasLyrics] = useState(true);
   const [lyricsLanguage, setLyricsLanguage] = useState<'ko' | 'en'>('ko');
+
+  const filteredEmotions = useMemo(() => {
+    return EMOTIONS.filter((e) => e.category === selectedCategory);
+  }, [selectedCategory]);
 
   const canGenerate = selectedEmotion !== null && credits > 0;
 
@@ -73,8 +79,13 @@ export const HomePage: React.FC = () => {
         {/* Emotion Selection */}
         <section className="emotion-section home-card">
           <h3 className="section-label">지금 느끼는 감정을 선택해주세요</h3>
+          <EmotionCategoryTabs
+            selectedCategory={selectedCategory}
+            onCategoryChange={setSelectedCategory}
+            disabled={credits <= 0}
+          />
           <div className="emotion-grid">
-            {EMOTIONS.map((emotion) => (
+            {filteredEmotions.map((emotion) => (
               <div className="emotion-chip-wrapper" key={emotion.id}>
                 <EmotionChip
                   emotion={emotion}

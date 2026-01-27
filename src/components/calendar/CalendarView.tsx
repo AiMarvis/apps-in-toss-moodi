@@ -18,7 +18,7 @@ interface CalendarViewProps {
   currentDate: Date;
   onMonthChange: (date: Date) => void;
   onDateSelect: (date: Date) => void;
-  diaryDates: Map<string, string>;
+  diaryDates: Map<string, string[]>;
   selectedDate: Date | null;
 }
 
@@ -32,6 +32,18 @@ const getEmotionColor = (emotion: string): string => {
     depressed: 'var(--color-emotion-depressed)',
     tired: 'var(--color-emotion-tired)',
     calm: 'var(--color-emotion-calm)',
+    happy: 'var(--color-emotion-happy)',
+    excited: 'var(--color-emotion-excited)',
+    grateful: 'var(--color-emotion-grateful)',
+    nostalgic: 'var(--color-emotion-nostalgic)',
+    bittersweet: 'var(--color-emotion-bittersweet)',
+    cozy: 'var(--color-emotion-cozy)',
+    hopeful: 'var(--color-emotion-hopeful)',
+    empty: 'var(--color-emotion-empty)',
+    lonely: 'var(--color-emotion-lonely)',
+    stressed: 'var(--color-emotion-stressed)',
+    frustrated: 'var(--color-emotion-frustrated)',
+    disappointed: 'var(--color-emotion-disappointed)',
   };
   return map[emotion.toLowerCase()] || 'var(--color-text-hint)';
 };
@@ -102,7 +114,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
       <div className="days-grid">
         {days.map((day) => {
           const dateKey = formatDateKey(day);
-          const emotion = diaryDates.get(dateKey);
+          const emotions = diaryDates.get(dateKey);
           const isSelected = selectedDate ? isSameDay(day, selectedDate) : false;
           const isCurrentMonth = isSameMonth(day, monthStart);
           const isDayToday = isToday(day);
@@ -119,11 +131,19 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
               onClick={() => onDateSelect(day)}
             >
               <span className="day-number">{format(day, 'd')}</span>
-              {emotion && (
-                <div 
-                  className="emotion-dot" 
-                  style={{ backgroundColor: getEmotionColor(emotion) }}
-                />
+              {emotions && emotions.length > 0 && (
+                <div className="emotion-dots">
+                  {emotions.slice(0, 3).map((emotion, idx) => (
+                    <div 
+                      key={idx}
+                      className="emotion-dot" 
+                      style={{ backgroundColor: getEmotionColor(emotion) }}
+                    />
+                  ))}
+                  {emotions.length > 3 && (
+                    <span className="emotion-more">+{emotions.length - 3}</span>
+                  )}
+                </div>
               )}
             </div>
           );
