@@ -859,10 +859,10 @@ export const sunoCallback = functions
     }
   });
 
-// SKU → 크레딧 매핑 (서버에서 검증)
+// SKU → 크레딧 매핑 (콘솔에 등록된 실제 SKU)
 const SKU_CREDITS_MAP: Record<string, number> = {
-  'moodi.credit.10': 10,
-  'moodi.credit.33': 33,
+  'ait.0000016097.f76c6d89.d0f7b885a1.9280987313': 10,
+  'ait.0000016097.d45c9f93.8d290d7c33.9281037096': 33,
 };
 
 /**

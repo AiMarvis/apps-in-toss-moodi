@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@toss/tds-mobile';
 import { CreditIndicator } from '../components/credit/CreditIndicator';
 import { useCredits } from '../hooks/useCredits';
 import { useIap } from '../hooks/useIap';
 import { INITIAL_CREDITS, CREDIT_PRODUCTS, type CreditProduct } from '../constants/emotions';
+import { format, parseISO } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import './CreditStorePage.css';
 
 // 크레딧 패키지 (UI 표시용)
@@ -21,11 +24,18 @@ const CREDIT_PACKAGES = [
 export const CreditStorePage: React.FC = () => {
   const navigate = useNavigate();
   const { refetch } = useCredits();
-  const { purchase, loading: iapLoading, error: iapError } = useIap();
+  const { purchase, loading: iapLoading, error: iapError, fetchOrderHistory, orderHistory } = useIap();
 
   const [purchaseError, setPurchaseError] = useState<string | null>(null);
   const [lastFailedProduct, setLastFailedProduct] = useState<CreditProduct | null>(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+
+  useEffect(() => {
+    if (showHistory && orderHistory.orders.length === 0 && !orderHistory.loading) {
+      fetchOrderHistory();
+    }
+  }, [showHistory, orderHistory.orders.length, orderHistory.loading, fetchOrderHistory]);
 
   // 패키지에 해당하는 상품 찾기
   const findProduct = (pkg: typeof CREDIT_PACKAGES[0]): CreditProduct | undefined => {
@@ -124,13 +134,16 @@ export const CreditStorePage: React.FC = () => {
             </div>
             <div className="error-actions">
               {lastFailedProduct && (
-                <button
-                  className="retry-button"
+                <Button
+                  color="primary"
+                  variant="weak"
+                  size="small"
                   onClick={handleRetry}
                   disabled={isLoading}
+                  loading={isLoading}
                 >
-                  {isLoading ? '처리 중...' : '다시 시도'}
-                </button>
+                  다시 시도
+                </Button>
               )}
               <button
                 className="dismiss-button"
@@ -157,13 +170,16 @@ export const CreditStorePage: React.FC = () => {
                   <span className="amount-unit">크레딧</span>
                 </div>
                 <div className="package-price">{pkg.price}</div>
-                <button
-                  className="buy-button"
+                <Button
+                  color="primary"
+                  display="block"
+                  size="medium"
                   onClick={() => handleBuy(pkg)}
                   disabled={isLoading}
+                  loading={isLoading}
                 >
-                  {isLoading ? '처리 중...' : '구매하기'}
-                </button>
+                  구매하기
+                </Button>
               </div>
             ))}
           </div>
@@ -177,6 +193,63 @@ export const CreditStorePage: React.FC = () => {
             <li>구매한 크레딧은 유효기간이 없어요</li>
             <li>환불은 구매 후 7일 이내에 가능해요</li>
           </ul>
+        </section>
+
+        {/* Payment History */}
+        <section className="history-section">
+          <button
+            className="history-toggle"
+            onClick={() => setShowHistory(!showHistory)}
+          >
+            <span className="history-toggle-text">결제 내역</span>
+            <span className={`history-toggle-icon ${showHistory ? 'open' : ''}`}>
+              ▼
+            </span>
+          </button>
+
+          {showHistory && (
+            <div className="history-content">
+              {orderHistory.loading && (
+                <p className="history-loading">불러오는 중...</p>
+              )}
+
+              {orderHistory.error && (
+                <p className="history-error">{orderHistory.error}</p>
+              )}
+
+              {!orderHistory.loading && !orderHistory.error && orderHistory.orders.length === 0 && (
+                <p className="history-empty">아직 결제 내역이 없어요</p>
+              )}
+
+              {orderHistory.orders.length > 0 && (
+                <ul className="history-list">
+                  {orderHistory.orders.map((order) => {
+                    const product = CREDIT_PRODUCTS.find(p => p.sku === order.sku);
+                    const productName = product ? `${product.amount} 크레딧` : '크레딧';
+                    const formattedDate = (() => {
+                      try {
+                        return format(parseISO(order.date), 'yyyy.MM.dd', { locale: ko });
+                      } catch {
+                        return order.date;
+                      }
+                    })();
+
+                    return (
+                      <li key={order.orderId} className="history-item">
+                        <div className="history-item-info">
+                          <span className="history-item-name">{productName}</span>
+                          <span className="history-item-date">{formattedDate}</span>
+                        </div>
+                        <span className={`history-item-status ${order.status.toLowerCase()}`}>
+                          {order.status === 'COMPLETED' ? '완료' : '환불됨'}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          )}
         </section>
       </main>
 

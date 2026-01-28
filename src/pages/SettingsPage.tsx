@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@toss/tds-mobile';
 import { useAuth } from '../hooks/useAuth';
 import { useCredits } from '../hooks/useCredits';
 import './SettingsPage.css';
@@ -46,13 +47,16 @@ export const SettingsPage: React.FC = () => {
             {!user ? (
               <div className="login-section">
                 <p className="login-description">토스 계정으로 로그인하면 모든 기기에서 음악을 동기화할 수 있어요</p>
-                <button 
-                  className="login-button"
+                <Button
+                  color="primary"
+                  display="block"
+                  size="large"
                   onClick={handleLogin}
                   disabled={loading}
+                  loading={loading}
                 >
-                  {loading ? '로그인 중...' : '토스로 로그인'}
-                </button>
+                  토스로 로그인
+                </Button>
               </div>
             ) : (
               <div className="profile-item">
@@ -94,7 +98,7 @@ export const SettingsPage: React.FC = () => {
             <div className="menu-divider" />
             <a
               className="menu-item"
-              href="mailto:support@moodi.example.com?subject=환불 요청"
+              href="mailto:innerbuilder00@gmail.com?subject=환불 요청"
             >
               <div className="menu-icon">💳</div>
               <div className="menu-content">
@@ -123,7 +127,7 @@ export const SettingsPage: React.FC = () => {
             <div className="menu-divider" />
             <a 
               className="menu-item" 
-              href="https://moodi.example.com/privacy" 
+              href="/privacy.html" 
               target="_blank" 
               rel="noopener noreferrer"
             >
@@ -155,7 +159,7 @@ export const SettingsPage: React.FC = () => {
           <div className="settings-card">
             <a 
               className="menu-item" 
-              href="mailto:support@moodi.example.com"
+              href="mailto:innerbuilder00@gmail.com"
             >
               <div className="menu-icon">📧</div>
               <div className="menu-content">

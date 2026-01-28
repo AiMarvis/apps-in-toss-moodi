@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { TDSMobileAITProvider } from '@toss/tds-mobile-ait';
 import { TabBar } from './components/common/TabBar';
 import { useAuthStore } from './stores/authStore';
 
@@ -80,9 +81,11 @@ function App() {
   }, [initialize]);
 
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <TDSMobileAITProvider>
+      <BrowserRouter>
+        <AppContent />
+      </BrowserRouter>
+    </TDSMobileAITProvider>
   );
 }
 

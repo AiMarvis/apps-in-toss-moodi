@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>개인정보 처리방침 - Moodi</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.8;
+      color: #1a1a1a;
+      background-color: #ffffff;
+      padding: 24px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 32px;
+      text-align: center;
+      color: #111;
+    }
+    h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-top: 40px;
+      margin-bottom: 16px;
+      color: #111;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 8px;
+    }
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 12px;
+      color: #333;
+    }
+    p {
+      margin-bottom: 12px;
+      font-size: 14px;
+      color: #444;
+    }
+    ol, ul {
+      margin-left: 20px;
+      margin-bottom: 16px;
+    }
+    li {
+      font-size: 14px;
+      color: #444;
+      margin-bottom: 8px;
+    }
+    .section {
+      margin-bottom: 32px;
+    }
+    .highlight {
+      background-color: #f8f9fa;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+    }
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid #eee;
+      text-align: center;
+      color: #888;
+      font-size: 12px;
+    }
+    code {
+      background-color: #f1f3f5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px;
+      text-align: left;
+      font-size: 14px;
+    }
+    th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <h1>Moodi 개인정보 처리방침</h1>
+
+  <div class="section">
+    <p>이너빌더(이하 "회사")는 「개인정보 보호법」에 따라 정보주체의 개인정보를 보호하고 이와 관련한 고충을 신속하고 원활하게 처리할 수 있도록 다음과 같이 개인정보 처리방침을 수립·공개합니다.</p>
+  </div>
+
+  <div class="section">
+    <h2>제1조 (개인정보의 수집 항목 및 수집 방법)</h2>
+
+    <h3>1. 수집하는 개인정보 항목</h3>
+    <p>회사는 서비스 제공을 위해 최소한의 개인정보만을 수집하며, 다음과 같은 항목을 수집합니다:</p>
+    
+    <div class="highlight">
+      <table>
+        <thead>
+          <tr>
+            <th>수집 항목</th>
+            <th>수집 목적</th>
+            <th>보유 기간</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Firebase Anonymous Auth UID</td>
+            <td>서비스 이용자 식별, 음악 및 크레딧 관리</td>
+            <td>서비스 탈퇴 시 또는 마지막 접속일로부터 1년</td>
+          </tr>
+          <tr>
+            <td>토스 사용자 식별자 (<code>userKey</code>)</td>
+            <td>토스 로그인 연동, 결제 내역 관리</td>
+            <td>토스 연동 해지 시 또는 서비스 탈퇴 시</td>
+          </tr>
+          <tr>
+            <td>감정 선택 기록</td>
+            <td>AI 음악 생성, 서비스 품질 개선</td>
+            <td>서비스 탈퇴 시 또는 마지막 접속일로부터 1년</td>
+          </tr>
+          <tr>
+            <td>생성된 음악 파일 및 메타데이터</td>
+            <td>음악 재생 및 라이브러리 관리</td>
+            <td>사용자 삭제 요청 시 또는 서비스 탈퇴 시</td>
+          </tr>
+          <tr>
+            <td>크레딧 구매 및 사용 내역</td>
+            <td>결제 처리, 크레딧 관리, 환불 처리</td>
+            <td>전자상거래법에 따라 5년</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>2. 개인정보 수집 방법</h3>
+    <ul>
+      <li>토스 앱 내 앱인토스 플랫폼을 통한 서비스 접속 시 자동 수집</li>
+      <li>토스 로그인 연동 시 토스로부터 제공받음</li>
+      <li>서비스 이용 과정에서 자동 생성 및 수집</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>제2조 (개인정보의 수집 및 이용 목적)</h2>
+    <p>회사는 수집한 개인정보를 다음의 목적을 위해 이용합니다:</p>
+    <ol>
+      <li><strong>서비스 제공:</strong> 회원 식별, AI 음악 생성, 음악 재생 및 저장, 라이브러리 관리</li>
+      <li><strong>크레딧 관리:</strong> 크레딧 잔액 관리, 구매 및 사용 내역 기록</li>
+      <li><strong>결제 처리:</strong> 인앱결제 처리, 환불 처리, 결제 내역 조회</li>
+      <li><strong>서비스 개선:</strong> 서비스 이용 통계 분석, 품질 개선</li>
+      <li><strong>고객 지원:</strong> 문의 응대, 불만 처리, 공지사항 전달</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <h2>제3조 (개인정보의 제3자 제공)</h2>
+    <p>회사는 원칙적으로 정보주체의 개인정보를 제3자에게 제공하지 않습니다. 다만, 다음의 경우에는 예외로 합니다:</p>
+    
+    <div class="highlight">
+      <table>
+        <thead>
+          <tr>
+            <th>제공받는 자</th>
+            <th>제공 항목</th>
+            <th>제공 목적</th>
+            <th>보유 기간</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Suno, Inc. (AI 음악 생성 API 제공사)</td>
+            <td>감정 키워드, 음악 생성 요청 정보</td>
+            <td>AI 음악 생성 서비스 제공</td>
+            <td>Suno의 개인정보 처리방침에 따름</td>
+          </tr>
+          <tr>
+            <td>토스 (비바리퍼블리카)</td>
+            <td>결제 정보</td>
+            <td>인앱결제 처리</td>
+            <td>토스의 개인정보 처리방침에 따름</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>또한 다음의 경우에는 정보주체의 동의 없이 개인정보를 제공할 수 있습니다:</p>
+    <ul>
+      <li>법령에 특별한 규정이 있거나 법적 의무 준수를 위해 불가피한 경우</li>
+      <li>정보주체 또는 제3자의 생명, 신체, 재산의 이익을 위해 긴급히 필요한 경우</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>제4조 (개인정보 처리의 위탁)</h2>
+    <p>회사는 서비스 제공을 위해 다음과 같이 개인정보 처리 업무를 위탁합니다:</p>
+    
+    <div class="highlight">
+      <table>
+        <thead>
+          <tr>
+            <th>수탁업체</th>
+            <th>위탁 업무</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Google LLC (Firebase)</td>
+            <td>클라우드 서버 운영, 데이터베이스 관리, 사용자 인증, 파일 저장</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>제5조 (개인정보의 보유 및 이용 기간)</h2>
+    <ol>
+      <li>회사는 법령에 따른 개인정보 보유·이용 기간 또는 정보주체로부터 동의받은 기간 내에서 개인정보를 처리·보유합니다.</li>
+      <li>각각의 개인정보 처리 및 보유 기간은 다음과 같습니다:
+        <ul>
+          <li><strong>서비스 이용 기록:</strong> 서비스 탈퇴 시 또는 마지막 접속일로부터 1년</li>
+          <li><strong>결제 및 크레딧 기록:</strong> 「전자상거래 등에서의 소비자보호에 관한 법률」에 따라 5년</li>
+          <li><strong>소비자 불만 또는 분쟁 처리 기록:</strong> 「전자상거래 등에서의 소비자보호에 관한 법률」에 따라 3년</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <h2>제6조 (개인정보의 파기 절차 및 방법)</h2>
+    
+    <h3>1. 파기 절차</h3>
+    <p>회사는 개인정보 보유 기간의 경과, 처리 목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체 없이 해당 개인정보를 파기합니다.</p>
+
+    <h3>2. 파기 방법</h3>
+    <ul>
+      <li><strong>전자적 파일:</strong> 기록을 재생할 수 없는 기술적 방법을 사용하여 완전히 삭제</li>
+      <li><strong>서버 데이터:</strong> Firebase Firestore 및 Cloud Storage에서 영구 삭제</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h2>제7조 (정보주체의 권리·의무 및 행사 방법)</h2>
+    <p>정보주체는 회사에 대해 언제든지 다음 각 호의 권리를 행사할 수 있습니다:</p>
+    <ol>
+      <li>개인정보 열람 요구</li>
+      <li>오류 등이 있을 경우 정정 요구</li>
+      <li>삭제 요구</li>
+      <li>처리 정지 요구</li>
+    </ol>
+    <p>권리 행사는 서비스 내 '설정 > 문의하기' 또는 이메일(<code>innerbuilder00@gmail.com</code>)을 통해 요청할 수 있습니다.</p>
+  </div>
+
+  <div class="section">
+    <h2>제8조 (개인정보의 안전성 확보 조치)</h2>
+    <p>회사는 개인정보의 안전성 확보를 위해 다음과 같은 조치를 취하고 있습니다:</p>
+    <ol>
+      <li><strong>관리적 조치:</strong> 개인정보 취급 직원의 최소화, 정기적인 보안 교육</li>
+      <li><strong>기술적 조치:</strong> 
+        <ul>
+          <li>Firebase 보안 규칙을 통한 접근 통제</li>
+          <li>HTTPS를 통한 데이터 암호화 전송</li>
+          <li>Firebase의 저장 시 암호화 적용</li>
+        </ul>
+      </li>
+      <li><strong>물리적 조치:</strong> Google Cloud Platform의 물리적 보안 시설 활용</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <h2>제9조 (개인정보 자동 수집 장치의 설치·운영 및 거부)</h2>
+    <p>회사는 별도의 쿠키를 사용하지 않습니다. 다만, Firebase Analytics를 통해 서비스 이용 통계를 수집할 수 있으며, 이는 개인을 식별하지 않는 형태로 처리됩니다.</p>
+  </div>
+
+  <div class="section">
+    <h2>제10조 (개인정보 보호책임자)</h2>
+    <div class="highlight">
+      <p><strong>개인정보 보호책임자</strong></p>
+      <ul>
+        <li>상호: 이너빌더</li>
+        <li>이메일: innerbuilder00@gmail.com</li>
+      </ul>
+    </div>
+    <p>정보주체는 서비스 이용 중 발생한 모든 개인정보 보호 관련 문의, 불만 처리, 피해 구제 등에 관한 사항을 개인정보 보호책임자에게 문의할 수 있습니다.</p>
+  </div>
+
+  <div class="section">
+    <h2>제11조 (개인정보 처리방침의 변경)</h2>
+    <p>이 개인정보 처리방침은 시행일로부터 적용되며, 법령 및 방침에 따른 변경 내용의 추가, 삭제 및 정정이 있는 경우에는 변경사항의 시행 7일 전부터 서비스 내 공지사항을 통하여 고지할 것입니다.</p>
+  </div>
+
+  <div class="section highlight">
+    <h3>부칙</h3>
+    <p>이 개인정보 처리방침은 2025년 1월 1일부터 시행합니다.</p>
+  </div>
+
+  <div class="footer">
+    <p>© 2025 Moodi. All rights reserved.</p>
+    <p>이너빌더 | 앱인토스 플랫폼</p>
+  </div>
+</body>
+</html>

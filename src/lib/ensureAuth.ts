@@ -52,13 +52,7 @@ export async function signInWithToss(): Promise<User | null> {
     
     return userCredential.user;
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : String(err);
-    const errorStack = err instanceof Error ? err.stack : '';
     logger.error('Auth', '로그인 에러', err);
-    
-    // DEBUG: 샌드박스에서 에러 확인용 (배포 전 제거)
-    alert(`[DEBUG] 로그인 에러:\n${errorMessage}\n\n${errorStack}`);
-    
     return null;
   }
 }

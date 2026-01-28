@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from '@toss/tds-mobile';
 import { EmotionChip } from '../components/common/EmotionChip';
 import { EmotionCategoryTabs } from '../components/common/EmotionCategoryTabs';
 import { CreditIndicator } from '../components/credit/CreditIndicator';
@@ -202,13 +203,15 @@ export const HomePage: React.FC = () => {
 
       {/* Generate Button */}
       <footer className="home-footer">
-        <button
-          className={`generate-button ${canGenerate ? '' : 'disabled'}`}
+        <Button
+          color="primary"
+          display="block"
+          size="xlarge"
           onClick={handleGenerate}
           disabled={!canGenerate}
         >
           🎵 나만의 음악 만들기
-        </button>
+        </Button>
       </footer>
     </div>
   );

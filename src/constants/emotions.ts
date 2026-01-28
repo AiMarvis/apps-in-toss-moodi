@@ -63,9 +63,9 @@ export interface CreditProduct {
   popular?: boolean;
 }
 
-// 크레딧 상품 목록
+// 크레딧 상품 목록 (콘솔에 등록된 실제 SKU 사용)
 export const CREDIT_PRODUCTS: CreditProduct[] = [
-  { sku: 'moodi.credit.10', amount: 10, price: 3300 },
-  { sku: 'moodi.credit.33', amount: 33, price: 9900, popular: true },
+  { sku: 'ait.0000016097.f76c6d89.d0f7b885a1.9280987313', amount: 10, price: 3300 },
+  { sku: 'ait.0000016097.d45c9f93.8d290d7c33.9281037096', amount: 33, price: 9900, popular: true },
 ];
 

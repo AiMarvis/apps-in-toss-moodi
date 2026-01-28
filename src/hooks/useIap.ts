@@ -8,9 +8,25 @@ interface IapState {
   error: string | null;
 }
 
+interface OrderHistoryItem {
+  orderId: string;
+  sku: string;
+  status: 'COMPLETED' | 'REFUNDED';
+  date: string;
+}
+
+interface OrderHistoryResult {
+  orders: OrderHistoryItem[];
+  hasNext: boolean;
+  loading: boolean;
+  error: string | null;
+}
+
 interface UseIapReturn extends IapState {
   purchase: (product: CreditProduct) => Promise<boolean>;
   restorePendingOrders: () => Promise<void>;
+  fetchOrderHistory: () => Promise<OrderHistoryItem[]>;
+  orderHistory: OrderHistoryResult;
 }
 
 /**
@@ -116,5 +132,60 @@ export function useIap(): UseIapReturn {
     }
   }, []);
 
-  return { loading, error, purchase, restorePendingOrders };
+  /**
+   * 결제 내역 상태
+   */
+  const [orderHistory, setOrderHistory] = useState<OrderHistoryResult>({
+    orders: [],
+    hasNext: false,
+    loading: false,
+    error: null,
+  });
+
+  /**
+   * 결제 내역 조회 (완료/환불된 주문)
+   */
+  const fetchOrderHistory = useCallback(async (): Promise<OrderHistoryItem[]> => {
+    setOrderHistory((prev) => ({ ...prev, loading: true, error: null }));
+
+    try {
+      const result = await IAP.getCompletedOrRefundedOrders();
+      if (!result) {
+        // 앱 버전이 낮아 지원되지 않는 경우
+        setOrderHistory({
+          orders: [],
+          hasNext: false,
+          loading: false,
+          error: null,
+        });
+        return [];
+      }
+
+      const orders = result.orders.map((order) => ({
+        orderId: order.orderId,
+        sku: order.sku,
+        status: order.status,
+        date: order.date,
+      }));
+
+      setOrderHistory({
+        orders,
+        hasNext: result.hasNext,
+        loading: false,
+        error: null,
+      });
+
+      return orders;
+    } catch (err) {
+      console.error('결제 내역 조회 실패:', err);
+      setOrderHistory((prev) => ({
+        ...prev,
+        loading: false,
+        error: '결제 내역을 불러올 수 없어요.',
+      }));
+      return [];
+    }
+  }, []);
+
+  return { loading, error, purchase, restorePendingOrders, fetchOrderHistory, orderHistory };
 }

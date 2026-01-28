@@ -1,5 +1,5 @@
 import React from 'react';
-import './ConfirmModal.css';
+import { ConfirmDialog } from '@toss/tds-mobile';
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -22,25 +22,25 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onCancel,
   variant = 'default',
 }) => {
-  if (!isOpen) return null;
-
   return (
-    <div className="modal-overlay" onClick={onCancel}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h3 className="modal-title">{title}</h3>
-        <p className="modal-message">{message}</p>
-        <div className="modal-actions">
-          <button className="modal-cancel" onClick={onCancel}>
-            {cancelText}
-          </button>
-          <button 
-            className={`modal-confirm ${variant === 'danger' ? 'danger' : ''}`} 
-            onClick={onConfirm}
-          >
-            {confirmText}
-          </button>
-        </div>
-      </div>
-    </div>
+    <ConfirmDialog
+      open={isOpen}
+      title={title}
+      description={message}
+      onClose={onCancel}
+      cancelButton={
+        <ConfirmDialog.CancelButton onClick={onCancel}>
+          {cancelText}
+        </ConfirmDialog.CancelButton>
+      }
+      confirmButton={
+        <ConfirmDialog.ConfirmButton
+          onClick={onConfirm}
+          color={variant === 'danger' ? 'danger' : 'primary'}
+        >
+          {confirmText}
+        </ConfirmDialog.ConfirmButton>
+      }
+    />
   );
 };
