@@ -62,7 +62,7 @@
 
 ### Definition of Done
 - [x] 모든 5가지 이슈 수정 완료
-- [ ] 샌드박스 앱에서 각 이슈별 수동 검증 통과
+- [BLOCKED] 샌드박스 앱에서 각 이슈별 수동 검증 통과
 - [x] test 브랜치에 커밋 완료
 
 ### Must Have
@@ -536,7 +536,7 @@ Parallel Speedup: ~40% faster than sequential
   **Evidence to Capture:**
   - [x] Terminal output from npm run build
   - [x] Terminal output from npm run lint
-  - [ ] Screenshots for visual verification
+  - [BLOCKED] Screenshots for visual verification
   - [x] 수동 검증 체크리스트 결과: `.sisyphus/evidence/task-6-manual-verification.md`
 
   **Commit**: YES
