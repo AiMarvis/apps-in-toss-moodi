@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { getMyTracks, deleteTrack as deleteTrackApi } from '../api/trackApi';
-import { ensureAuth } from '../lib/ensureAuth';
-import { getErrorMessage, isAuthError } from '../utils/errorHandler';
+import { auth } from '../lib/firebase';
+import { getErrorMessage } from '../utils/errorHandler';
 import type { Track } from '../types/emotion';
 
 interface MyTracksState {
@@ -34,8 +34,12 @@ export function useMyTracks(): MyTracksState {
     setError(null);
 
     try {
-      // Lazy Auth: Firebase 기능 사용 전 인증 보장
-      const user = await ensureAuth();
+      // 로그인 안 되어 있으면 빈 목록 유지 (자동 로그인 X)
+      const user = auth.currentUser;
+      if (!user) {
+        setLoading(false);
+        return;
+      }
       console.log('[useMyTracks] 인증된 사용자:', user.uid);
 
       const result = await getMyTracks({
@@ -60,11 +64,7 @@ export function useMyTracks(): MyTracksState {
         setLastTrackId(newTracks[newTracks.length - 1].id);
       }
     } catch (err) {
-      if (isAuthError(err)) {
-        setError('로그인에 실패했어요. 다시 시도해주세요.');
-      } else {
-        setError(getErrorMessage(err));
-      }
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -79,10 +79,13 @@ export function useMyTracks(): MyTracksState {
 
   // 트랙 삭제
   const deleteTrack = useCallback(async (trackId: string): Promise<boolean> => {
-    try {
-      // Lazy Auth: Firebase 기능 사용 전 인증 보장
-      await ensureAuth();
+    const user = auth.currentUser;
+    if (!user) {
+      setError('로그인이 필요합니다.');
+      return false;
+    }
 
+    try {
       await deleteTrackApi(trackId);
       
       // 로컬 상태에서도 제거

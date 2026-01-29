@@ -30,14 +30,15 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       if (firebaseUser && firebaseUser.uid.startsWith('toss_')) {
         try {
           const isLinked = await getIsTossLoginIntegratedService();
-          if (!isLinked) {
+          if (isLinked === false) {
             // 연동 해제된 경우 자동 로그아웃
             await auth.signOut();
             set({ user: null, credits: 0, loading: false, initialized: true });
             return;
           }
-        } catch {
-          // 연동 상태 확인 실패 시 무시 (정상 진행)
+        } catch (error) {
+          // 연동 상태 확인 실패 시 로깅 후 정상 진행
+          console.error('[AuthStore] 연동 상태 확인 실패:', error);
         }
       }
 

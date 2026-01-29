@@ -256,10 +256,13 @@
 
 .emotion-chip-wrapper {
   display: flex;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .emotion-chip-wrapper > * {
   width: 100%;
+  min-width: 0;
   min-height: 56px;
   border-radius: 16px !important;
   font-size: 16px !important;

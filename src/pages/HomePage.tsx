@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@toss/tds-mobile';
-import { closeView } from '@apps-in-toss/web-framework';
+import { closeView, graniteEvent } from '@apps-in-toss/web-framework';
 import { EmotionChip } from '../components/common/EmotionChip';
 import { EmotionCategoryTabs } from '../components/common/EmotionCategoryTabs';
 import { CreditIndicator } from '../components/credit/CreditIndicator';
@@ -40,12 +40,14 @@ export const HomePage: React.FC = () => {
 
   // 홈 화면에서 백버튼 시 앱 종료
   useEffect(() => {
-    const handlePopState = async () => {
-      await closeView();
-    };
-    
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    const unsubscription = graniteEvent.addEventListener('backEvent', {
+      onEvent: async () => {
+        await closeView();
+      },
+      onError: (error) => console.error('[HomePage] backEvent error:', error),
+    });
+
+    return () => unsubscription();
   }, []);
 
   const filteredEmotions = useMemo(() => {

@@ -6,7 +6,7 @@
   justify-content: center;
   gap: 6px;
   height: 48px;
-  padding: 0 20px;
+  padding: 0 12px;
   border-radius: var(--radius-chip);
   border: none;
   cursor: pointer;
@@ -16,6 +16,8 @@
   touch-action: manipulation;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .emotion-chip .emoji {
@@ -27,6 +29,9 @@
   font-size: 15px;
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Selected State */
