@@ -352,6 +352,10 @@
   pointer-events: none;
 }
 
+.home-footer button {
+  pointer-events: auto;
+}
+
 .generate-button {
   pointer-events: auto;
   width: 100%;
