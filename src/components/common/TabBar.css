@@ -83,6 +83,11 @@
   animation: fadeIn 0.3s ease forwards;
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @media (prefers-color-scheme: dark) {
   .tab-bar {
     background-color: rgba(30, 30, 30, 0.85);

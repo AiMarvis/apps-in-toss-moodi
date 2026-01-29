@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@toss/tds-mobile';
+import { closeView } from '@apps-in-toss/web-framework';
 import { EmotionChip } from '../components/common/EmotionChip';
 import { EmotionCategoryTabs } from '../components/common/EmotionCategoryTabs';
 import { CreditIndicator } from '../components/credit/CreditIndicator';
@@ -36,6 +37,16 @@ export const HomePage: React.FC = () => {
   const [emotionText, setEmotionText] = useState('');
   const [hasLyrics, setHasLyrics] = useState(true);
   const [lyricsLanguage, setLyricsLanguage] = useState<'ko' | 'en'>('ko');
+
+  // 홈 화면에서 백버튼 시 앱 종료
+  useEffect(() => {
+    const handlePopState = async () => {
+      await closeView();
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const filteredEmotions = useMemo(() => {
     return EMOTIONS.filter((e) => e.category === selectedCategory);

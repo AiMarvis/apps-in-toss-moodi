@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { auth, onAuthStateChanged, getUserInfoFn } from '../lib/firebase';
 import { signInWithToss } from '../lib/ensureAuth';
 import { restorePendingIapOrders } from '../lib/iapRestore';
+import { getIsTossLoginIntegratedService } from '@apps-in-toss/web-framework';
 import type { User } from '../lib/firebase';
 
 interface AuthStore {
@@ -25,6 +26,21 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   initialize: () => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      // 토스 사용자인 경우 연동 상태 확인
+      if (firebaseUser && firebaseUser.uid.startsWith('toss_')) {
+        try {
+          const isLinked = await getIsTossLoginIntegratedService();
+          if (!isLinked) {
+            // 연동 해제된 경우 자동 로그아웃
+            await auth.signOut();
+            set({ user: null, credits: 0, loading: false, initialized: true });
+            return;
+          }
+        } catch {
+          // 연동 상태 확인 실패 시 무시 (정상 진행)
+        }
+      }
+
       set({ user: firebaseUser, loading: false, initialized: true });
 
       if (firebaseUser) {
