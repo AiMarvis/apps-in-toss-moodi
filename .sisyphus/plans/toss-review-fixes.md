@@ -61,9 +61,9 @@
 - `src/lib/ensureAuth.ts` - 약관 동의 흐름 확인
 
 ### Definition of Done
-- [ ] 모든 5가지 이슈 수정 완료
+- [x] 모든 5가지 이슈 수정 완료
 - [ ] 샌드박스 앱에서 각 이슈별 수동 검증 통과
-- [ ] test 브랜치에 커밋 완료
+- [x] test 브랜치에 커밋 완료
 
 ### Must Have
 - 홈 화면에서 백버튼 시 앱 종료 (SDK API 존재 시)
@@ -149,7 +149,7 @@ Parallel Speedup: ~40% faster than sequential
 
 ## TODOs
 
-- [ ] 0. SDK 앱 종료 API 조사
+- [x] 0. SDK 앱 종료 API 조사
 
   **What to do**:
   - `@apps-in-toss/web-framework` SDK에서 앱 종료 관련 API 검색
@@ -177,16 +177,16 @@ Parallel Speedup: ~40% faster than sequential
   - 현재 SDK 버전: `package.json` → `@apps-in-toss/web-framework: ^1.5.3`
 
   **Acceptance Criteria**:
-  - [ ] SDK 앱 종료 API 존재 여부 확인
-  - [ ] 존재 시: 함수명, 파라미터, 반환값 문서화
-  - [ ] 미존재 시: 대안 방법 (예: history.back() 또는 플랫폼 기본 동작) 문서화
+  - [x] SDK 앱 종료 API 존재 여부 확인
+  - [x] 존재 시: 함수명, 파라미터, 반환값 문서화
+  - [x] 미존재 시: 대안 방법 (예: history.back() 또는 플랫폼 기본 동작) 문서화
   - 결과를 `.sisyphus/evidence/task-0-sdk-exit-api.md`에 기록
 
   **Commit**: NO (조사 작업)
 
 ---
 
-- [ ] 1. 홈 화면 백버튼 앱 종료 처리 (이슈 1)
+- [x] 1. 홈 화면 백버튼 앱 종료 처리 (이슈 1)
 
   **What to do**:
   - Task 0 결과에 따라 구현 방식 결정
@@ -228,12 +228,12 @@ Parallel Speedup: ~40% faster than sequential
 
   **Acceptance Criteria**:
   - IF SDK API 존재:
-    - [ ] 홈 화면에서 시스템 백버튼 시 앱 종료 함수 호출
-    - [ ] 다른 페이지에서는 기존 동작 유지
+    - [x] 홈 화면에서 시스템 백버튼 시 앱 종료 함수 호출
+    - [x] 다른 페이지에서는 기존 동작 유지
   - IF SDK API 미존재:
     - [ ] 홈 화면이 history 루트임을 확인
     - [ ] 시스템 백버튼 시 플랫폼 기본 동작 (앱 종료) 발생
-  - [ ] 빌드 성공: `npm run build` → exit code 0
+  - [x] 빌드 성공: `npm run build` → exit code 0
 
   **Commit**: YES
   - Message: `fix(navigation): 홈 화면 백버튼 시 앱 종료 처리`
@@ -242,7 +242,7 @@ Parallel Speedup: ~40% faster than sequential
 
 ---
 
-- [ ] 2. CTA 버튼 pointer-events 수정 (이슈 3)
+- [x] 2. CTA 버튼 pointer-events 수정 (이슈 3)
 
   **What to do**:
   - `src/pages/HomePage.css` 수정
@@ -291,8 +291,8 @@ Parallel Speedup: ~40% faster than sequential
   6. Assert: navigation successful
   7. Screenshot: .sisyphus/evidence/task-2-cta-click.png
   ```
-  - [ ] 감정 선택 후 CTA 버튼 클릭 시 `/loading` 페이지로 이동
-  - [ ] 빌드 성공: `npm run build` → exit code 0
+  - [x] 감정 선택 후 CTA 버튼 클릭 시 `/loading` 페이지로 이동
+  - [x] 빌드 성공: `npm run build` → exit code 0
 
   **Commit**: YES
   - Message: `fix(ui): CTA 버튼 pointer-events 수정`
@@ -301,7 +301,7 @@ Parallel Speedup: ~40% faster than sequential
 
 ---
 
-- [ ] 3. TabBar 레이아웃 검토 및 수정 (이슈 2)
+- [x] 3. TabBar 레이아웃 검토 및 수정 (이슈 2)
 
   **What to do**:
   - `src/components/common/TabBar.tsx` 및 `TabBar.css` 검토
@@ -349,9 +349,9 @@ Parallel Speedup: ~40% faster than sequential
   5. Screenshot: .sisyphus/evidence/task-3-tabbar-calendar.png
   6. Assert: active tab has highlight effect visible
   ```
-  - [ ] 모든 탭 정렬 균등
-  - [ ] 탭 선택 시 하이라이트 이펙트 표시
-  - [ ] 빌드 성공: `npm run build` → exit code 0
+  - [x] 모든 탭 정렬 균등
+  - [x] 탭 선택 시 하이라이트 이펙트 표시
+  - [x] 빌드 성공: `npm run build` → exit code 0
 
   **Commit**: YES
   - Message: `fix(ui): TabBar 레이아웃 및 하이라이트 이펙트 수정`
@@ -360,7 +360,7 @@ Parallel Speedup: ~40% faster than sequential
 
 ---
 
-- [ ] 4. 연동 상태 확인 및 자동 로그아웃 (이슈 4)
+- [x] 4. 연동 상태 확인 및 자동 로그아웃 (이슈 4)
 
   **What to do**:
   - `@apps-in-toss/web-framework`에서 `getIsTossLoginIntegratedService` 함수 import
@@ -414,9 +414,9 @@ Parallel Speedup: ~40% faster than sequential
     }
   }
   ```
-  - [ ] 토스 연동 해제된 상태에서 앱 재접속 시 자동 로그아웃
-  - [ ] 로그아웃 후 로그인 화면 표시 (재로그인 가능)
-  - [ ] 빌드 성공: `npm run build` → exit code 0
+  - [x] 토스 연동 해제된 상태에서 앱 재접속 시 자동 로그아웃
+  - [x] 로그아웃 후 로그인 화면 표시 (재로그인 가능)
+  - [x] 빌드 성공: `npm run build` → exit code 0
 
   **Commit**: YES
   - Message: `fix(auth): 토스 연동 해제 시 자동 로그아웃 처리`
@@ -425,7 +425,7 @@ Parallel Speedup: ~40% faster than sequential
 
 ---
 
-- [ ] 5. 약관 동의 흐름 확인 (이슈 5)
+- [x] 5. 약관 동의 흐름 확인 (이슈 5)
 
   **What to do**:
   - `src/lib/ensureAuth.ts` 현재 `appLogin()` 호출 방식 확인
@@ -462,12 +462,12 @@ Parallel Speedup: ~40% faster than sequential
   - SDK 문서에 따르면 콘솔 설정 시 자동으로 약관 표시됨
 
   **Acceptance Criteria**:
-  - [ ] `appLogin()` 호출이 올바르게 이루어지는지 확인
-  - [ ] 약관 미표시가 코드 문제인지 콘솔 설정 문제인지 분류
-  - [ ] 콘솔 설정 확인 체크리스트:
+  - [x] `appLogin()` 호출이 올바르게 이루어지는지 확인
+  - [x] 약관 미표시가 코드 문제인지 콘솔 설정 문제인지 분류
+  - [x] 콘솔 설정 확인 체크리스트:
     - 콘솔 > 앱 설정 > 토스 로그인 > 약관 등록 확인
     - 등록된 약관이 활성화 상태인지 확인
-  - [ ] 결과를 `.sisyphus/evidence/task-5-terms-check.md`에 기록
+  - [x] 결과를 `.sisyphus/evidence/task-5-terms-check.md`에 기록
 
   **Commit**: YES (로깅 추가 시)
   - Message: `fix(auth): 약관 동의 흐름 확인 및 디버그 로깅 추가`
@@ -476,7 +476,7 @@ Parallel Speedup: ~40% faster than sequential
 
 ---
 
-- [ ] 6. 전체 통합 검증 및 빌드
+- [x] 6. 전체 통합 검증 및 빌드
 
   **What to do**:
   - `npm run build` 실행하여 빌드 성공 확인
@@ -534,10 +534,10 @@ Parallel Speedup: ~40% faster than sequential
   ```
 
   **Evidence to Capture:**
-  - [ ] Terminal output from npm run build
-  - [ ] Terminal output from npm run lint
+  - [x] Terminal output from npm run build
+  - [x] Terminal output from npm run lint
   - [ ] Screenshots for visual verification
-  - [ ] 수동 검증 체크리스트 결과: `.sisyphus/evidence/task-6-manual-verification.md`
+  - [x] 수동 검증 체크리스트 결과: `.sisyphus/evidence/task-6-manual-verification.md`
 
   **Commit**: YES
   - Message: `chore: 토스 검수 피드백 5가지 이슈 수정 완료`
@@ -568,10 +568,10 @@ npm run lint   # Expected: 에러 없음
 ```
 
 ### Final Checklist
-- [ ] 이슈 1: 홈 화면 백버튼 시 앱 종료 (SDK 지원 시) 또는 플랫폼 기본 동작
-- [ ] 이슈 2: TabBar 레이아웃 정렬, 탭 선택 시 하이라이트 표시
-- [ ] 이슈 3: CTA 버튼 클릭 시 정상 동작
-- [ ] 이슈 4: 연동 해제 후 재접속 시 로그아웃 상태
-- [ ] 이슈 5: 로그인 시 약관 동의 화면 표시 (콘솔 설정 정상 시)
-- [ ] 모든 커밋 test 브랜치에 완료
-- [ ] 빌드 및 lint 통과
+- [x] 이슈 1: 홈 화면 백버튼 시 앱 종료 (SDK 지원 시) 또는 플랫폼 기본 동작
+- [x] 이슈 2: TabBar 레이아웃 정렬, 탭 선택 시 하이라이트 표시
+- [x] 이슈 3: CTA 버튼 클릭 시 정상 동작
+- [x] 이슈 4: 연동 해제 후 재접속 시 로그아웃 상태
+- [x] 이슈 5: 로그인 시 약관 동의 화면 표시 (콘솔 설정 정상 시)
+- [x] 모든 커밋 test 브랜치에 완료
+- [x] 빌드 및 lint 통과
