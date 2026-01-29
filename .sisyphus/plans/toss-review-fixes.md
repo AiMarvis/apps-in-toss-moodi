@@ -231,8 +231,8 @@ Parallel Speedup: ~40% faster than sequential
     - [x] 홈 화면에서 시스템 백버튼 시 앱 종료 함수 호출
     - [x] 다른 페이지에서는 기존 동작 유지
   - IF SDK API 미존재:
-    - [ ] 홈 화면이 history 루트임을 확인
-    - [ ] 시스템 백버튼 시 플랫폼 기본 동작 (앱 종료) 발생
+    - [N/A] 홈 화면이 history 루트임을 확인
+    - [N/A] 시스템 백버튼 시 플랫폼 기본 동작 (앱 종료) 발생
   - [x] 빌드 성공: `npm run build` → exit code 0
 
   **Commit**: YES
