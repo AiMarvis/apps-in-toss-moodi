@@ -25,6 +25,28 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   initialized: false,
 
   initialize: () => {
+    // visibility change 리스너 - 앱이 포그라운드로 돌아올 때 연동 상태 확인
+    const handleVisibilityChange = async () => {
+      if (document.visibilityState !== 'visible') return;
+
+      const currentUser = auth.currentUser;
+      if (!currentUser || !currentUser.uid.startsWith('toss_')) return;
+
+      try {
+        const isLinked = await getIsTossLoginIntegratedService();
+        if (isLinked === false) {
+          // 연동 해제된 경우 자동 로그아웃
+          await auth.signOut();
+          set({ user: null, credits: 0, loading: false, initialized: true });
+        }
+      } catch (error) {
+        // 연동 상태 확인 실패 시 로깅 후 정상 진행
+        console.error('[AuthStore] visibility change - 연동 상태 확인 실패:', error);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       // 토스 사용자인 경우 연동 상태 확인
       if (firebaseUser && firebaseUser.uid.startsWith('toss_')) {
@@ -52,7 +74,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         });
       }
     });
-    return unsubscribe;
+
+    // cleanup 함수: 두 리스너 모두 정리
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      unsubscribe();
+    };
   },
 
   login: async () => {

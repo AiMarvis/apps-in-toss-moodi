@@ -288,6 +288,58 @@ const EMOTION_DESCRIPTIONS: Record<EmotionKeyword, string> = {
   disappointed: '실망을 위로하는 곡',
 };
 
+// ========================================
+// V5 최적화된 짧은 한국어 프롬프트 (500자 이내)
+// customMode: false 사용 시 Suno가 자동으로 한국어 가사 생성
+// ========================================
+
+const KOREAN_SHORT_PROMPTS: Record<EmotionKeyword, string> = {
+  sad: '언어: 한국어(한글만). 감정: 슬픔, 그리움. 장르: K-발라드, 피아노. 분위기: 감성적, 위로. 템포: 느림(65BPM). 구조: Verse-Chorus-Bridge. 주제: 이별과 눈물. 영어 금지.',
+  anxious: '언어: 한국어(한글만). 감정: 불안, 평온 찾기. 장르: K-인디, 어쿠스틱. 분위기: 차분, 힐링. 템포: 매우느림(55BPM). 구조: Verse-Chorus. 주제: 마음의 안식. 영어 금지.',
+  angry: '언어: 한국어(한글만). 감정: 분노, 해방. 장르: K-록, 일렉트릭 기타. 분위기: 강렬, 카타르시스. 템포: 빠름(120BPM). 구조: Verse-Chorus-Bridge. 주제: 감정 폭발. 영어 금지.',
+  depressed: '언어: 한국어(한글만). 감정: 우울, 희망. 장르: K-R&B, 로파이. 분위기: 몽환적, 따뜻함. 템포: 느림(70BPM). 구조: Verse-Chorus. 주제: 어둠 속 빛. 영어 금지.',
+  tired: '언어: 한국어(한글만). 감정: 피로, 휴식. 장르: 발라드, 어쿠스틱. 분위기: 포근, 자장가. 템포: 매우느림(50BPM). 구조: Verse-Chorus. 주제: 쉼과 위로. 영어 금지.',
+  calm: '언어: 한국어(한글만). 감정: 평온, 감사. 장르: K-포크, 어쿠스틱 기타. 분위기: 명상적, 자연. 템포: 느림(65BPM). 구조: Verse-Chorus. 주제: 고요한 순간. 영어 금지.',
+  happy: '언어: 한국어(한글만). 감정: 행복, 기쁨. 장르: K-팝, 어쿠스틱. 분위기: 밝음, 경쾌. 템포: 빠름(110BPM). 구조: Verse-Chorus-Bridge. 주제: 즐거운 하루. 영어 금지.',
+  excited: '언어: 한국어(한글만). 감정: 설렘, 기대. 장르: K-팝, 신스. 분위기: 에너지, 두근거림. 템포: 빠름(130BPM). 구조: Verse-Chorus-Drop. 주제: 새로운 시작. 영어 금지.',
+  grateful: '언어: 한국어(한글만). 감정: 감사, 따뜻함. 장르: K-발라드, 오케스트라. 분위기: 진심, 감동. 템포: 중간(80BPM). 구조: Verse-Chorus-Bridge. 주제: 고마운 마음. 영어 금지.',
+  nostalgic: '언어: 한국어(한글만). 감정: 그리움, 추억. 장르: 레트로 K-팝, 신스. 분위기: 몽환적, 아련함. 템포: 중간(85BPM). 구조: Verse-Chorus. 주제: 지난 시간. 영어 금지.',
+  bittersweet: '언어: 한국어(한글만). 감정: 씁쓸함, 아름다움. 장르: K-인디, 피아노. 분위기: 섬세, 감성. 템포: 느림(60BPM). 구조: Verse-Chorus. 주제: 아픈 기억. 영어 금지.',
+  cozy: '언어: 한국어(한글만). 감정: 포근함, 편안. 장르: 어쿠스틱, 카페음악. 분위기: 따뜻, 아늑. 템포: 느림(70BPM). 구조: Verse-Chorus. 주제: 일상의 행복. 영어 금지.',
+  hopeful: '언어: 한국어(한글만). 감정: 희망, 용기. 장르: K-발라드, 오케스트라. 분위기: 감동, 고양. 템포: 중간(90BPM). 구조: Verse-Chorus-Bridge. 주제: 밝은 내일. 영어 금지.',
+  empty: '언어: 한국어(한글만). 감정: 공허, 성찰. 장르: 앰비언트, 미니멀 피아노. 분위기: 고요, 사색. 템포: 매우느림(45BPM). 구조: Verse-Chorus. 주제: 텅 빈 마음. 영어 금지.',
+  lonely: '언어: 한국어(한글만). 감정: 외로움, 그리움. 장르: K-발라드, 솔로 기타. 분위기: 쓸쓸함, 내밀함. 템포: 느림(55BPM). 구조: Verse-Chorus. 주제: 혼자인 밤. 영어 금지.',
+  stressed: '언어: 한국어(한글만). 감정: 긴장→해소. 장르: K-록→발라드. 분위기: 긴장에서 평온으로. 템포: 변화(빠름→느림). 구조: Verse-Chorus-Bridge. 주제: 스트레스 해방. 영어 금지.',
+  frustrated: '언어: 한국어(한글만). 감정: 답답함, 돌파. 장르: K-록, 강렬. 분위기: 억눌림→해방. 템포: 빠름(115BPM). 구조: Verse-Chorus-Bridge. 주제: 한계 극복. 영어 금지.',
+  disappointed: '언어: 한국어(한글만). 감정: 실망, 수용. 장르: K-발라드, 피아노. 분위기: 쓸쓸, 받아들임. 템포: 느림(60BPM). 구조: Verse-Chorus. 주제: 새 출발. 영어 금지.',
+};
+
+/**
+ * V5용 짧은 한국어 프롬프트 생성 (500자 이내)
+ * customMode: false 사용 시 Suno가 자동으로 한국어 가사 생성
+ */
+export function buildShortKoreanPrompt(
+  emotion: EmotionKeyword,
+  text?: string,
+  musicType?: string
+): string {
+  let prompt = KOREAN_SHORT_PROMPTS[emotion];
+
+  // 음악 스타일 오버라이드 (있으면)
+  if (musicType && MUSIC_STYLE_PROMPTS[musicType]) {
+    prompt = prompt.replace(/장르: [^.]+\./, `장르: ${musicType}.`);
+  }
+
+  // 사용자 텍스트 추가 (짧게)
+  if (text?.trim()) {
+    const shortText = text.substring(0, 50);
+    prompt = `${prompt} 영감: "${shortText}"`;
+  }
+
+  // 500자 제한
+  return prompt.substring(0, 500);
+}
+
 const ALBUM_ART_MAP: Record<EmotionKeyword, string> = {
   sad: '/assets/album/album_sad.svg',
   anxious: '/assets/album/album_anxious.svg',

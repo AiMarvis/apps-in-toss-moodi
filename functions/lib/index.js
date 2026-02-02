@@ -93,17 +93,19 @@ exports.generateMusic = functions
         throw new functions.https.HttpsError('resource-exhausted', '크레딧이 부족해요. 내일 다시 시도해주세요!');
     }
     try {
-        // 음악 프롬프트 생성 (스타일 및 가사 힌트 반영)
-        let prompt = (0, generators_1.buildMusicPrompt)(emotion, text, musicType, instrumental, lyricsLanguage);
-        // Suno API 호출 (콜백 URL 포함)
+        // V5용 프롬프트 생성: 한국어 가사 곡은 짧은 프롬프트 사용 (customMode: false)
+        const isKoreanVocal = !instrumental && lyricsLanguage === 'ko';
+        let prompt = isKoreanVocal
+            ? (0, generators_1.buildShortKoreanPrompt)(emotion, text, musicType)
+            : (0, generators_1.buildMusicPrompt)(emotion, text, musicType, instrumental, lyricsLanguage);
         const callBackUrl = 'https://us-central1-moodi-b8811.cloudfunctions.net/sunoCallback';
         let sunoResponse;
         try {
             sunoResponse = await axios_1.default.post(`${SUNO_API_BASE}/api/v1/generate`, {
                 prompt,
-                model: 'V4_5ALL',
+                model: 'V5',
                 instrumental: instrumental !== null && instrumental !== void 0 ? instrumental : false,
-                customMode: !instrumental,
+                customMode: false,
                 callBackUrl,
             }, {
                 headers: {
@@ -114,17 +116,18 @@ exports.generateMusic = functions
             });
         }
         catch (apiError) {
-            // 아티스트 이름 오인식 에러 시 사용자 텍스트 제외하고 재시도
             const axiosError = apiError;
             if (((_a = axiosError.response) === null || _a === void 0 ? void 0 : _a.status) === 400 &&
                 ((_d = (_c = (_b = axiosError.response) === null || _b === void 0 ? void 0 : _b.data) === null || _c === void 0 ? void 0 : _c.msg) === null || _d === void 0 ? void 0 : _d.includes('artist name'))) {
                 console.log('[Fallback] 아티스트 이름 오인식으로 재시도 (텍스트 제외)');
-                prompt = (0, generators_1.buildMusicPrompt)(emotion, undefined, musicType, instrumental, lyricsLanguage);
+                prompt = isKoreanVocal
+                    ? (0, generators_1.buildShortKoreanPrompt)(emotion, undefined, musicType)
+                    : (0, generators_1.buildMusicPrompt)(emotion, undefined, musicType, instrumental, lyricsLanguage);
                 sunoResponse = await axios_1.default.post(`${SUNO_API_BASE}/api/v1/generate`, {
                     prompt,
-                    model: 'V4_5ALL',
+                    model: 'V5',
                     instrumental: instrumental !== null && instrumental !== void 0 ? instrumental : false,
-                    customMode: !instrumental,
+                    customMode: false,
                     callBackUrl,
                 }, {
                     headers: {

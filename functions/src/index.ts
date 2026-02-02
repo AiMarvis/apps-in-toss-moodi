@@ -17,6 +17,7 @@ import {
 } from './types';
 import {
   buildMusicPrompt,
+  buildShortKoreanPrompt,
   generateTitle,
   generateDescription,
   getAlbumArt,
@@ -82,10 +83,12 @@ export const generateMusic = functions
     }
 
     try {
-      // 음악 프롬프트 생성 (스타일 및 가사 힌트 반영)
-      let prompt = buildMusicPrompt(emotion, text, musicType, instrumental, lyricsLanguage);
+      // V5용 프롬프트 생성: 한국어 가사 곡은 짧은 프롬프트 사용 (customMode: false)
+      const isKoreanVocal = !instrumental && lyricsLanguage === 'ko';
+      let prompt = isKoreanVocal 
+        ? buildShortKoreanPrompt(emotion, text, musicType)
+        : buildMusicPrompt(emotion, text, musicType, instrumental, lyricsLanguage);
 
-      // Suno API 호출 (콜백 URL 포함)
       const callBackUrl = 'https://us-central1-moodi-b8811.cloudfunctions.net/sunoCallback';
 
       let sunoResponse;
@@ -94,9 +97,9 @@ export const generateMusic = functions
           `${SUNO_API_BASE}/api/v1/generate`,
           {
             prompt,
-            model: 'V4_5ALL',
+            model: 'V5',
             instrumental: instrumental ?? false,
-            customMode: !instrumental,
+            customMode: false,
             callBackUrl,
           },
           {
@@ -108,20 +111,21 @@ export const generateMusic = functions
           }
         );
       } catch (apiError: unknown) {
-        // 아티스트 이름 오인식 에러 시 사용자 텍스트 제외하고 재시도
         const axiosError = apiError as { response?: { status?: number; data?: { msg?: string } } };
         if (axiosError.response?.status === 400 &&
             axiosError.response?.data?.msg?.includes('artist name')) {
           console.log('[Fallback] 아티스트 이름 오인식으로 재시도 (텍스트 제외)');
-          prompt = buildMusicPrompt(emotion, undefined, musicType, instrumental, lyricsLanguage);
+          prompt = isKoreanVocal
+            ? buildShortKoreanPrompt(emotion, undefined, musicType)
+            : buildMusicPrompt(emotion, undefined, musicType, instrumental, lyricsLanguage);
 
           sunoResponse = await axios.post(
             `${SUNO_API_BASE}/api/v1/generate`,
             {
               prompt,
-              model: 'V4_5ALL',
+              model: 'V5',
               instrumental: instrumental ?? false,
-              customMode: !instrumental,
+              customMode: false,
               callBackUrl,
             },
             {

@@ -1,5 +1,6 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { AlertDialog } from '@toss/tds-mobile';
 import { MusicPlayer } from '../components/player/MusicPlayer';
 import { useDiary } from '../hooks/useDiary';
 import type { Track, EmotionKeyword } from '../types/emotion';
@@ -23,6 +24,7 @@ export const PlayerPage: React.FC = () => {
   const state = location.state as LocationState | null;
   const { addDiary } = useDiary();
   const diarySavedRef = useRef(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   // 디버깅: location.state 확인
   console.log('[PlayerPage] Mounted with location.state:', {
@@ -95,7 +97,7 @@ export const PlayerPage: React.FC = () => {
         await navigator.clipboard.writeText(
           `Moodi가 내 기분에 맞는 음악을 만들어줬어요! 🎵\n${track.title} - ${track.description}`
         );
-        alert('링크가 복사되었어요!');
+        setIsAlertOpen(true);
       }
     } catch (error) {
       console.error('Share failed:', error);
@@ -121,6 +123,11 @@ export const PlayerPage: React.FC = () => {
           onShare={handleShare}
         />
       </main>
+
+      <AlertDialog
+        open={isAlertOpen}
+        onClose={() => setIsAlertOpen(false)}
+      />
     </div>
   );
 };
