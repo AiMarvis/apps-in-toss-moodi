@@ -1,8 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AlertDialog } from '@toss/tds-mobile';
 import { MusicPlayer } from '../components/player/MusicPlayer';
-import { useDiary } from '../hooks/useDiary';
 import type { Track, EmotionKeyword } from '../types/emotion';
 import './PlayerPage.css';
 
@@ -17,13 +16,13 @@ interface LocationState {
  * - 앨범 아트
  * - Play/Pause
  * - 화면 유지 안내
+ * 
+ * Note: 일기는 백엔드(sunoCallback)에서 자동 저장됨 - 중복 생성 방지
  */
 export const PlayerPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as LocationState | null;
-  const { addDiary } = useDiary();
-  const diarySavedRef = useRef(false);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   // 디버깅: location.state 확인
@@ -37,41 +36,6 @@ export const PlayerPage: React.FC = () => {
   });
 
   const track = state?.track;
-  const emotion = state?.emotion;
-  const emotionText = state?.emotionText;
-
-  useEffect(() => {
-    if (!track) return;
-    if (diarySavedRef.current) return;
-    if (!emotion) return;
-
-    const saveDiary = async () => {
-      const now = new Date();
-      const kstDate = new Date(now.getTime() + (9 * 60 * 60 * 1000));
-      const today = kstDate.toISOString().split('T')[0];
-      console.log('[PlayerPage] Saving diary for trackId:', track.id);
-      
-      try {
-        const result = await addDiary({
-          date: today,
-          emotion,
-          content: emotionText || track.description,
-          trackId: track.id,
-        });
-        
-        if (result) {
-          diarySavedRef.current = true;
-          console.log('[PlayerPage] Diary saved successfully:', result.id);
-        } else {
-          console.error('[PlayerPage] addDiary returned null');
-        }
-      } catch (err) {
-        console.error('[PlayerPage] Failed to save diary:', err);
-      }
-    };
-
-    saveDiary();
-  }, [track, emotion, emotionText, addDiary]);
 
   // 트랙 정보 없으면 홈으로
   if (!track) {

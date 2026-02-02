@@ -11,6 +11,7 @@ node_modules
 node_modules.nosync
 dist
 dist-ssr
+*.ait
 *.local
 
 # Editor directories and files
@@ -40,6 +41,5 @@ mTLS_*/
 
 # 로컬 개발용 설정 (marvis 개인 설정)
 granite.config-marvis.ts
-moodi-marvis.ait
 package-marvis.json
 package-lock-marvis.json
