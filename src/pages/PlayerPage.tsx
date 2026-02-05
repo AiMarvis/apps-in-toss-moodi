@@ -91,6 +91,9 @@ export const PlayerPage: React.FC = () => {
       <AlertDialog
         open={isAlertOpen}
         onClose={() => setIsAlertOpen(false)}
+        title="링크가 복사되었어요"
+        description="친구들에게 음악을 공유해보세요!"
+        alertButton="확인"
       />
     </div>
   );

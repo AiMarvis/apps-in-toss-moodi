@@ -35,8 +35,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       try {
         const isLinked = await getIsTossLoginIntegratedService();
         if (isLinked === false) {
-          // 연동 해제된 경우 자동 로그아웃
+          // 연동 해제된 경우 자동 로그아웃 및 온보딩 상태 초기화
           await auth.signOut();
+          localStorage.removeItem('moodi_seen_intro');
           set({ user: null, credits: 0, loading: false, initialized: true });
         }
       } catch (error) {
@@ -53,8 +54,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         try {
           const isLinked = await getIsTossLoginIntegratedService();
           if (isLinked === false) {
-            // 연동 해제된 경우 자동 로그아웃
+            // 연동 해제된 경우 자동 로그아웃 및 온보딩 상태 초기화
             await auth.signOut();
+            localStorage.removeItem('moodi_seen_intro');
             set({ user: null, credits: 0, loading: false, initialized: true });
             return;
           }
