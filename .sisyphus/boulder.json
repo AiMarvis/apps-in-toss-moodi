@@ -1,8 +1,6 @@
 {
-  "active_plan": "/Users/innerbuilder/Projects/moodi-local/.sisyphus/plans/toss-review-fixes.md",
-  "started_at": "2026-01-29T10:55:00.000Z",
-  "session_ids": [
-    "ses_3f6bf3281ffegDsFUBpsZirKLU"
-  ],
-  "plan_name": "toss-review-fixes"
+  "active_plan": "/Users/innerbuilder/Projects/moodi-local/.sisyphus/plans/toss-rejection-fixes.md",
+  "started_at": "2026-02-05T17:36:35.714Z",
+  "session_ids": ["ses_3d12aa17fffeqWSwW0F5A7WDgz"],
+  "plan_name": "toss-rejection-fixes"
 }

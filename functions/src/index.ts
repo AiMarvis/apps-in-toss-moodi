@@ -602,7 +602,7 @@ const TOSS_UNLINK_AUTH = defineSecret('TOSS_UNLINK_AUTH');
  * - referrer에 따라 적절한 처리 수행
  */
 export const tossUnlinkCallback = functions
-  .runWith({ secrets: [TOSS_UNLINK_AUTH], timeoutSeconds: 30, memory: '256MB' })
+  .runWith({ secrets: [TOSS_UNLINK_AUTH], timeoutSeconds: 60, memory: '256MB' })
   .https.onRequest(async (req, res) => {
     // POST 메서드만 허용
     if (req.method !== 'POST') {
@@ -669,22 +669,49 @@ export const tossUnlinkCallback = functions
       const userDoc = await userRef.get();
 
       if (userDoc.exists) {
-        await userRef.update({
-          tossUnlinkedAt: admin.firestore.Timestamp.now(),
-          tossUnlinkReason: referrer || 'UNKNOWN',
-          isLinkedToToss: false,
-        });
-        console.log(`[토스 연결 끊기] Firestore 업데이트 완료: ${firebaseUid}`);
+        // 유저 관련 모든 데이터 삭제
+        console.log(`[토스 연결 끊기] 유저 데이터 삭제 시작: ${firebaseUid}`);
 
-        // 선택: 토스 탈퇴의 경우 사용자 데이터 삭제 처리
-        if (referrer === 'WITHDRAWAL_TOSS') {
-          // TODO: 필요시 사용자 데이터 삭제 로직 추가
-          // 예: 일정 기간 후 자동 삭제를 위해 삭제 예정 마킹
-          await userRef.update({
-            scheduledForDeletion: true,
-            deletionScheduledAt: admin.firestore.Timestamp.now(),
-          });
+        // 1. 트랙 삭제 (Firestore + Storage)
+        const tracksSnapshot = await db.collection('tracks')
+          .where('userId', '==', firebaseUid).get();
+        await Promise.all(tracksSnapshot.docs.map(async (trackDoc) => {
+          // Storage MP3 파일 삭제
+          try {
+            await storage.bucket().file(`tracks/${firebaseUid}/${trackDoc.id}.mp3`).delete();
+          } catch (e) {
+            console.warn(`[토스 연결 끊기] Storage 파일 삭제 실패: tracks/${firebaseUid}/${trackDoc.id}.mp3`);
+          }
+          // Firestore 트랙 문서 삭제
+          await trackDoc.ref.delete();
+        }));
+
+        // 2. 일기 삭제
+        const diariesSnapshot = await db.collection('diaries')
+          .where('userId', '==', firebaseUid).get();
+        await Promise.all(diariesSnapshot.docs.map(doc => doc.ref.delete()));
+
+        // 3. 대기 작업 삭제
+        const pendingSnapshot = await db.collection('pendingTasks')
+          .where('userId', '==', firebaseUid).get();
+        await Promise.all(pendingSnapshot.docs.map(doc => doc.ref.delete()));
+
+        // 4. 주문 내역 삭제
+        const ordersSnapshot = await db.collection('orders')
+          .where('userId', '==', firebaseUid).get();
+        await Promise.all(ordersSnapshot.docs.map(doc => doc.ref.delete()));
+
+        // 5. 유저 문서 삭제
+        await userRef.delete();
+
+        // 6. Firebase Auth 유저 삭제
+        try {
+          await admin.auth().deleteUser(firebaseUid);
+        } catch (e) {
+          console.warn(`[토스 연결 끊기] Firebase Auth 유저 삭제 실패: ${firebaseUid}`);
         }
+
+        console.log(`[토스 연결 끊기] 유저 데이터 삭제 완료: ${firebaseUid}`);
       } else {
         console.log(`[토스 연결 끊기] 사용자 없음: ${firebaseUid}`);
       }

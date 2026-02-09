@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AlertDialog } from '@toss/tds-mobile';
+import { share, getTossShareLink } from '@apps-in-toss/web-framework';
 import { MusicPlayer } from '../components/player/MusicPlayer';
 import type { Track, EmotionKeyword } from '../types/emotion';
 import './PlayerPage.css';
@@ -23,8 +23,6 @@ export const PlayerPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as LocationState | null;
-  const [isAlertOpen, setIsAlertOpen] = useState(false);
-
   // 디버깅: location.state 확인
   console.log('[PlayerPage] Mounted with location.state:', {
     hasState: !!state,
@@ -49,20 +47,8 @@ export const PlayerPage: React.FC = () => {
 
   const handleShare = async () => {
     try {
-      // Web Share API 사용 (지원되는 경우)
-      if (navigator.share) {
-        await navigator.share({
-          title: track.title,
-          text: `Moodi가 내 기분에 맞는 음악을 만들어줬어요! 🎵\n${track.description}`,
-          url: window.location.href,
-        });
-      } else {
-        // 클립보드에 복사
-        await navigator.clipboard.writeText(
-          `Moodi가 내 기분에 맞는 음악을 만들어줬어요! 🎵\n${track.title} - ${track.description}`
-        );
-        setIsAlertOpen(true);
-      }
+      const tossLink = await getTossShareLink('intoss://my-moodi');
+      await share({ message: `Moodi가 내 기분에 맞는 음악을 만들어줬어요! 🎵\n${tossLink}` });
     } catch (error) {
       console.error('Share failed:', error);
     }
@@ -87,18 +73,6 @@ export const PlayerPage: React.FC = () => {
           onShare={handleShare}
         />
       </main>
-
-      <AlertDialog
-        open={isAlertOpen}
-        onClose={() => setIsAlertOpen(false)}
-        title="링크가 복사되었어요"
-        description="친구들에게 음악을 공유해보세요!"
-        alertButton={
-          <AlertDialog.AlertButton onClick={() => setIsAlertOpen(false)}>
-            확인
-          </AlertDialog.AlertButton>
-        }
-      />
     </div>
   );
 };
